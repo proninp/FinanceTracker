@@ -146,8 +146,13 @@ Table account {
   is_include_in_balance boolean [not null]
   is_default bool [not null]
   is_archived bool [not null]
-  is_deleted bool [not null]
   created_at timestamp [not null]
+  created_by uuid [null]
+  updated_at timestamp [not null]
+  updated_by uuid [null]
+  deleted_at timestamp [not null]
+  deleted_by uuid [null]
+  is_deleted bool [not null]
   indexes {
     (account_type_id)
     (user_id, currency_id)
@@ -164,6 +169,12 @@ Table category {
   emoji varchar [null]
   icon bytea [null]
   created_at timestamp [not null]
+  created_by uuid [null]
+  updated_at timestamp [not null]
+  updated_by uuid [null]
+  deleted_at timestamp [not null]
+  deleted_by uuid [null]
+  is_deleted bool [not null]
   indexes {
     (user_id, income)
     (user_id, expense)
