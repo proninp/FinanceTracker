@@ -1,0 +1,208 @@
+Table user {
+  id uuid [pk]
+  role int [not null]
+  display_name varchar
+  first_name varchar
+  second_name varchar
+  last_name varchar
+  is_active boolean
+  password_hash varchar
+  default_time_zone_id uuid [ref: > time_zone.id, null]
+  created_at timestamp [not null]
+  created_by uuid [null]
+  updated_at timestamp [not null]
+  updated_by uuid [null]
+  deleted_at timestamp [not null]
+  deleted_by uuid [null]
+  is_deleted bool [not null]
+}
+
+Table user_email {
+  id uuid [pk]
+  user_id uuid [not null, ref: > user.id] 
+  email varchar(124) [not null]
+  is_email_confirmed bool [not null]
+  is_primary bool [not null]
+  indexes {
+    (user_id)
+    (email)
+  }
+}
+
+Table user_password {
+  id uuid [pk]
+  user_id uuid [not null, ref: > user.id] 
+  password_hash varchar [not null]
+  indexes {
+    (user_id)
+  }
+}
+
+Table user_role {
+  id uuid [pk]
+  user_id uuid [not null, ref: > user.id] 
+  role_id uuid [not null, ref: > role.id]
+  indexes {
+    (user_id)
+    (role_id)
+  }
+}
+
+Table role {
+  id uuid [pk]
+  name varchar(256) [not null] 
+  is_active bool [not null]
+  is_default bool [not null]
+  claims jsonb [not null]
+  created_at timestamp [not null]
+  created_by uuid [null]
+  updated_at timestamp [not null]
+  updated_by uuid [null]
+  deleted_at timestamp [not null]
+  deleted_by uuid [null]
+  is_deleted bool [not null]
+  indexes {
+    (name) [unique]
+  }
+}
+
+
+Table refresh_token {
+  id uuid [pk]
+  user_id uuid [ref: > user.id, not null]
+  token varchar [not null]
+  expires_at timestamp [not null]
+  is_revoked boolean [not null]
+  created_at timestamp [not null]
+  indexes {
+    (user_id) [unique]
+  }
+}
+
+Table time_zone {
+  id uuid [pk]
+  name varchar [not null]
+  created_at timestamp [not null]
+}
+
+Table currency {
+  id uuid [pk]
+  name varchar [not null]
+  char_code varchar [not null]
+  num_code varchar [not null]
+  sign varchar [null]
+  emoji varchar [null]
+  is_deleted bool [not null]
+  created_at timestamp [not null]
+  indexes {
+    (char_code) [unique]
+    (num_code) [unique]
+  }
+}
+
+Table exchange_rate{
+  id uuid [pk]
+  rate_date datetime [not null]
+  currency_id uuid [ref: > currency.id, not null]
+  rate decimal [not null]
+  created_at timestamp [not null]
+}
+
+Table country {
+  id uuid [pk]
+  name varchar [unique, not null]
+  created_at timestamp [not null]
+}
+
+Table bank {
+  id uuid [pk]
+  country_id uuid [ref: > country.id, not null]
+  name varchar [not null]
+  created_at timestamp [not null]
+  indexes {
+    (country_id)
+  }
+}
+
+Table account_type {
+  id uuid [pk]
+  code varchar [not null]
+  description varchar [not null]
+  is_deleted bool [not null]
+  created_at timestamp [not null]
+  indexes {
+    (code) [unique]
+  }
+}
+
+Table account {
+  id uuid [pk]
+  user_id uuid [ref: > user.id, not null]
+  account_type_id uuid [ref: > account_type.id, not null]
+  currency_id uuid [ref: > currency.id, not null]
+  bank_id uuid [ref: > bank.id, not null]
+  name varchar [not null]
+  credit_limit decimal [null]
+  is_include_in_balance boolean [not null]
+  is_default bool [not null]
+  is_archived bool [not null]
+  is_deleted bool [not null]
+  created_at timestamp [not null]
+  indexes {
+    (account_type_id)
+    (user_id, currency_id)
+  }
+}
+
+Table category {
+  id uuid [pk]
+  parent_id uuid [ref: > category.id, null]
+  user_id uuid [ref: > user.id, not null]
+  name varchar [null]
+  income boolean [not null]
+  expense boolean [not null]
+  emoji varchar [null]
+  icon bytea [null]
+  created_at timestamp [not null]
+  indexes {
+    (user_id, income)
+    (user_id, expense)
+  }
+}
+
+Table transactions {
+  id uuid [pk]
+  account_id uuid [ref: > account.id, not null]
+  category_id uuid [ref: > category.id, not null]
+  amount decimal [not null]
+  description varchar [null]
+  created_at timestamp [not null]
+}
+
+Table transfers {
+  id uuid [pk]
+  from_account_id uuid [ref: > account.id, not null]
+  to_account_id uuid [ref: > account.id, not null]
+  from_amount decimal [not null]
+  to_amount decimal [not null, note: "When the from-account and the to-account have a different currencies"]
+  description varchar [null]
+  created_at timestamp [not null]
+}
+
+Table tg_user {
+  telegram_id bigint [not null, pk]
+  user_id uuid
+  role int [not null]
+  last_active_timestamp timestamp [not null]
+}
+
+Table tg_user_state {
+  telegram_user_id bigint [not null, pk, ref: > tg_user.telegram_id]
+  state_id uuid [not null, pk, ref: > tg_state.id]
+  context json
+}
+
+Table tg_state {
+  id uuid [pk]
+  name text
+}
