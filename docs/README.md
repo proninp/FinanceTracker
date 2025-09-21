@@ -4,7 +4,7 @@ Finance Tracker is a personal finance application for tracking and analyzing exp
 
 ## Description
 
-###🚀 Features
+### 🚀 Features
 
 * Create and manage real and virtual accounts
 * Track income, expenses, and transfers between accounts
