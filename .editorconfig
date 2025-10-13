@@ -10,3 +10,201 @@ indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 max_line_length = 200
+
+### Visual Studio Solution Files
+[*.sln]
+indent_style = tab
+
+[*.txt]
+insert_final_newline = false
+
+### Visual Studio XML Project Files
+[*.{csproj,vbproj,vcxproj.filters,proj,projitems,shproj}]
+indent_size = 2
+
+### XML Configuration Files
+[*.{xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
+indent_size = 2
+
+### JSON Files
+[*.{json,json5,webmanifest}]
+indent_size = 2
+
+### YAML Files
+[*.{yml,yaml}]
+indent_size = 2
+
+### Markdown Files
+[*.{md,mdx}]
+trim_trailing_whitespace = false
+
+### Web Files
+[*.{htm,html,js,jsm,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,svg,vue}]
+indent_size = 2
+
+# Batch Files
+[*.{cmd,bat}]
+end_of_line = crlf
+
+# Bash Files
+[*.sh]
+end_of_line = lf
+
+# Makefiles
+[Makefile]
+indent_style = tab
+
+## Code Quality Rules -- https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/quality-rules/
+
+[*.cs]
+# свойства не должны быть доступны только на запись
+dotnet_diagnostic.CA1044.severity = error
+# объявляйте типы в пространствах имен
+dotnet_diagnostic.CA1050.severity = error
+# параметры CancellationToken должны быть последними
+dotnet_diagnostic.CA1068.severity = error
+# перечисления не должны иметь повторяющиеся значения
+dotnet_diagnostic.CA1069.severity = error
+# избегайте излишнего наследования
+dotnet_diagnostic.CA1501.severity = error
+# вместо строки используйте nameof
+dotnet_diagnostic.CA1507.severity = error
+# идентификаторы должны отличаться не только регистром
+dotnet_diagnostic.CA1708.severity = error
+# проверьте неиспользуемые параметры
+dotnet_diagnostic.CA1801.severity = error
+# не используйте Count/LongCount, если можно использовать Any
+dotnet_diagnostic.CA1827.severity = error
+# не используйте CountAsync/LongCountAsync при использовании AnyAsync
+dotnet_diagnostic.CA1828.severity = error
+# используйте свойство Length/Count вместо метода Enumerable.Count
+dotnet_diagnostic.CA1829.severity = error
+# используйте StringBuilder.Append(char) для одно-символьных строк
+dotnet_diagnostic.CA1834.severity = error
+# используйте IsEmpty вместо Count по возможности
+dotnet_diagnostic.CA1836.severity = error
+# ненужный вызов "Dictionary.ContainsKey(key)"
+dotnet_diagnostic.CA1853.severity = error
+# предпочитать метод IDictionary.TryAdd(TKey, TValue)"
+dotnet_diagnostic.CA1864.severity = error
+# ненужный вызов "Contains" для наборов
+dotnet_diagnostic.CA1868.severity = error
+# кэшируйте и повторно используете экземпляры JsonSerializerOptions
+dotnet_diagnostic.CA1869.severity = error
+# не назначайте свойство в своем наборе
+dotnet_diagnostic.CA2011.severity = error
+# не используйте ReferenceEquals с типами значений
+dotnet_diagnostic.CA2013.severity = error
+# не вызывайте Enumerable.Cast<T или Enumerable.OfType>T<> с несовместимыми типами
+dotnet_diagnostic.CA2021.severity = error
+# следует повторно вызывать исключение для сохранения сведений о стеке
+dotnet_diagnostic.CA2200.severity = error
+# не константные поля должны быть скрыты
+dotnet_diagnostic.CA2211.severity = error
+# следует высвобождать высвобождаемые поля
+dotnet_diagnostic.CA2213.severity = error
+# высвобождаемые типы должны объявлять метод завершения
+dotnet_diagnostic.CA2216.severity = error
+# не присваивайте свойство свмому себе
+dotnet_diagnostic.CA2245.severity = error
+
+
+## Code style rules -- https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/style-rules/
+
+# Удаление ненужного приведения
+dotnet_diagnostic.IDE0004.severity = error
+# Удаление ненужных операций импорта
+dotnet_diagnostic.IDE0005.severity = error
+# Использование var вместо явного типа
+dotnet_diagnostic.IDE0007.severity = error
+# Использование сопоставления шаблонов, чтобы избежать проверки is, за которой следует приведение (с переменной)
+dotnet_diagnostic.IDE0020.severity = error
+# Проверка null может быть упрощена
+dotnet_diagnostic.IDE0029.severity = error
+dotnet_diagnostic.IDE0030.severity = error
+# Удаление недостижимого кода
+dotnet_diagnostic.IDE0035.severity = error
+# Модификаторы Order
+dotnet_diagnostic.IDE0036.severity = error
+# Использование сопоставления шаблонов, чтобы избежать проверки is, за которой следует приведение (без переменной)
+dotnet_diagnostic.IDE0038.severity = error
+# Использование проверки IS NULL
+dotnet_diagnostic.IDE0041.severity = error
+# Добавить модификатор readonly
+dotnet_diagnostic.IDE0044.severity = error
+# Удалить непрочитанные закрытые члены
+dotnet_diagnostic.IDE0052.severity = error
+# Удалите назначение лишних значений
+dotnet_diagnostic.IDE0059.severity = warning
+# Удалите неиспользуемый параметр
+dotnet_diagnostic.IDE0060.severity = error
+# Размещение директив using
+dotnet_diagnostic.IDE0065.severity = error
+# Удалить ненужное подавление
+dotnet_diagnostic.IDE0079.severity = error
+# Удаление ненужного оператора подавления
+dotnet_diagnostic.IDE0080.severity = error
+# Удалить ненужную пустую переменную
+dotnet_diagnostic.IDE0110.severity = error
+#Пространство имен не соответствует структуре папок
+dotnet_diagnostic.IDE0130.severity = error
+# Использование пространства имен с областью действия файла
+dotnet_diagnostic.IDE0161.severity = error
+# Удаление ненужного лямбда-выражения
+dotnet_diagnostic.IDE0200.severity = warning
+# Директива NULL является избыточной
+dotnet_diagnostic.IDE0240.severity = error
+# Использование выражения коллекции для Create()
+dotnet_diagnostic.IDE0303.severity = error
+# IDE2000: пустые строки
+dotnet_diagnostic.IDE2000.severity = error
+
+
+## Fixing formating  https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/style-rules/csharp-formatting-options
+dotnet_diagnostic.IDE0055.severity = warning
+
+dotnet_sort_system_directives_first = true
+
+### Параметры новой строки
+csharp_new_line_before_open_brace = all #### Все фигурные скобки { ставятся с новой строки
+csharp_new_line_before_else = true #### else - с новой строки
+csharp_new_line_before_catch = true #### catch - с новой строки
+csharp_new_line_before_finally = true #### finally - с новой строки
+csharp_new_line_before_members_in_object_initializers = true #### В инициализаторах объектов - каждый член с новой строки
+csharp_new_line_before_members_in_anonymous_types = true #### Аналогично для анонимных типов
+csharp_new_line_between_query_expression_clauses = true #### В LINQ-запросах (from ... where ... select ...) каждая часть - с новой строки
+
+### Параметры отступа
+csharp_indent_case_contents = true #### Тело case внутри switch - с отступом
+csharp_indent_switch_labels = true #### Метки case и default выровнены на 1 уровень глубже, чем switch
+csharp_indent_labels = flush_left #### Метки (например, goto label:) начинаются в самом начале строки
+csharp_indent_block_contents = true #### Вложенные блоки ({}) получают отступ
+csharp_indent_braces = false #### Скобки { не получают дополнительный отступ относительно блока
+csharp_indent_case_contents_when_block = false #### Если в case есть блок { }, его содержимое не получает дополнительный отступ
+
+### Параметры интервала
+csharp_space_after_cast = false #### После приведения (int)x - без пробела
+csharp_space_after_keywords_in_control_flow_statements = true #### После if, for, while ставим пробел: if (x)
+csharp_space_between_parentheses = false #### Внутри скобок нет пробелов
+csharp_space_before_colon_in_inheritance_clause = true #### class B : A - пробелы до и после :
+csharp_space_after_colon_in_inheritance_clause = true #### Управляет пробелом после двоеточия в определении базового типа или интерфейса
+csharp_space_around_binary_operators = before_and_after #### Операторы +, ==, = и т.п. - с пробелами по обе стороны 
+csharp_space_between_method_declaration_parameter_list_parentheses = false #### Ставится ли пробел внутри круглых скобок при объявлении метода, между скобкой и параметром
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false #### То же самое, но для методов без параметров
+csharp_space_between_method_declaration_name_and_open_parenthesis = false #### Ставится ли пробел между именем метода и открывающей скобкой при объявлении
+csharp_space_between_method_call_parameter_list_parentheses = false #### Контролирует пробелы внутри скобок при вызове метода (между ( и аргументом)
+csharp_space_between_method_call_empty_parameter_list_parentheses = false #### То же, но для вызовов без аргументов
+csharp_space_between_method_call_name_and_opening_parenthesis = false #### Определяет пробел между именем метода и скобкой при вызове
+csharp_space_after_comma = true #### После запятой - пробел
+csharp_space_before_comma = false #### Перед запятой - нет
+csharp_space_after_dot = false #### Вызовы obj.Method() - без пробелов вокруг точки
+csharp_space_before_dot = false #### Вызовы obj.Method() - без пробелов вокруг точки
+csharp_space_after_semicolon_in_for_statement = true #### В цикле for пробелы после ;
+csharp_space_before_semicolon_in_for_statement = false #### Нужен ли пробел перед точкой с запятой в операторе for
+csharp_space_around_declaration_statements = false #### Не добавлять пробелы вокруг объявлений
+csharp_space_before_open_square_brackets = false #### Без пробела перед [index]
+csharp_space_between_empty_square_brackets = false #### Управляет пробелом между пустыми квадратными скобками, например в объявлении массива или индексатора
+csharp_space_between_square_brackets = false #### Внутри [ ] - без пробелов
+
+csharp_preserve_single_line_blocks = true #### Нужно ли сохранять однострочные блоки кода при автоформатировании
+dotnet_style_allow_multiple_blank_lines_experimental = false #### Разрешить множественные пустые строки
