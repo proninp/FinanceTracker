@@ -111,52 +111,52 @@ dotnet_diagnostic.CA2245.severity = error
 
 ## Code style rules -- https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/style-rules/
 
-# Удаление ненужного приведения
+### Удаление ненужного приведения
 dotnet_diagnostic.IDE0004.severity = error
-# Удаление ненужных операций импорта
+### Удаление ненужных операций импорта
 dotnet_diagnostic.IDE0005.severity = error
-# Использование var вместо явного типа
+### Использование var вместо явного типа
 dotnet_diagnostic.IDE0007.severity = error
-# Использование сопоставления шаблонов, чтобы избежать проверки is, за которой следует приведение (с переменной)
+### Использование сопоставления шаблонов, чтобы избежать проверки is, за которой следует приведение (с переменной)
 dotnet_diagnostic.IDE0020.severity = error
-# Проверка null может быть упрощена
+### Проверка null может быть упрощена
 dotnet_diagnostic.IDE0029.severity = error
 dotnet_diagnostic.IDE0030.severity = error
-# Удаление недостижимого кода
+### Удаление недостижимого кода
 dotnet_diagnostic.IDE0035.severity = error
-# Модификаторы Order
+### Модификаторы Order
 dotnet_diagnostic.IDE0036.severity = error
-# Использование сопоставления шаблонов, чтобы избежать проверки is, за которой следует приведение (без переменной)
+### Использование сопоставления шаблонов, чтобы избежать проверки is, за которой следует приведение (без переменной)
 dotnet_diagnostic.IDE0038.severity = error
-# Использование проверки IS NULL
+### Использование проверки IS NULL
 dotnet_diagnostic.IDE0041.severity = error
-# Добавить модификатор readonly
+### Добавить модификатор readonly
 dotnet_diagnostic.IDE0044.severity = error
-# Удалить непрочитанные закрытые члены
+### Удалить непрочитанные закрытые члены
 dotnet_diagnostic.IDE0052.severity = error
-# Удалите назначение лишних значений
+### Удалите назначение лишних значений
 dotnet_diagnostic.IDE0059.severity = warning
-# Удалите неиспользуемый параметр
+### Удалите неиспользуемый параметр
 dotnet_diagnostic.IDE0060.severity = error
-# Размещение директив using
+### Размещение директив using
 dotnet_diagnostic.IDE0065.severity = error
-# Удалить ненужное подавление
+### Удалить ненужное подавление
 dotnet_diagnostic.IDE0079.severity = error
-# Удаление ненужного оператора подавления
+### Удаление ненужного оператора подавления
 dotnet_diagnostic.IDE0080.severity = error
-# Удалить ненужную пустую переменную
+### Удалить ненужную пустую переменную
 dotnet_diagnostic.IDE0110.severity = error
-#Пространство имен не соответствует структуре папок
+### Пространство имен не соответствует структуре папок
 dotnet_diagnostic.IDE0130.severity = error
-# Использование пространства имен с областью действия файла
+### Использование пространства имен с областью действия файла
 dotnet_diagnostic.IDE0161.severity = error
-# Удаление ненужного лямбда-выражения
+### Удаление ненужного лямбда-выражения
 dotnet_diagnostic.IDE0200.severity = warning
-# Директива NULL является избыточной
+### Директива NULL является избыточной
 dotnet_diagnostic.IDE0240.severity = error
-# Использование выражения коллекции для Create()
+### Использование выражения коллекции для Create()
 dotnet_diagnostic.IDE0303.severity = error
-# IDE2000: пустые строки
+### IDE2000: пустые строки
 dotnet_diagnostic.IDE2000.severity = error
 
 
@@ -208,3 +208,51 @@ csharp_space_between_square_brackets = false #### Внутри [ ] - без пр
 
 csharp_preserve_single_line_blocks = true #### Нужно ли сохранять однострочные блоки кода при автоформатировании
 dotnet_style_allow_multiple_blank_lines_experimental = false #### Разрешить множественные пустые строки
+
+
+## Naming styles -- https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/style-rules/naming-rules
+
+dotnet_diagnostic.IDE1006.severity = warning ### Общая диагностика
+
+dotnet_naming_style.first_word_upper_case_style.capitalization = first_word_upper ### Первое слово должно начинаться с заглавной буквы
+
+### Публичные сущности должны начинаться с заглавной буквы
+dotnet_naming_symbols.public_symbols.applicable_kinds = property, method, field, event, delegate
+dotnet_naming_symbols.public_symbols.applicable_accessibilities = public
+
+dotnet_naming_rule.public_members_must_be_capitalized.symbols = public_symbols
+dotnet_naming_rule.public_members_must_be_capitalized.style = first_word_upper_case_style
+dotnet_naming_rule.public_members_must_be_capitalized.severity = warning
+
+### Приватные нестатические поля должны начинаться с символа подчеркивания
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private, protected
+dotnet_naming_symbols.private_fields.required_modifiers = readonly
+
+dotnet_naming_style.underscored.required_prefix = _
+dotnet_naming_style.underscored.capitalization = camel_case
+
+dotnet_naming_rule.private_fields_underscored.symbols = private_fields
+dotnet_naming_rule.private_fields_underscored.style = underscored
+dotnet_naming_rule.private_fields_underscored.severity = warning
+
+### Приватные статические поля должны начинаться с заглавной буквы
+dotnet_naming_symbols.private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
+
+dotnet_naming_rule.private_static_fields_none.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_none.style = first_word_upper_case_style
+dotnet_naming_rule.private_static_fields_none.severity = warning
+
+### Типы должны начинаться с заглавной буквы
+dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum
+
+dotnet_naming_rule.types_members_must_be_capitalized.symbols = types
+dotnet_naming_rule.types_members_must_be_capitalized.style = first_word_upper_case_style
+dotnet_naming_rule.types_members_must_be_capitalized.severity = warning
+
+resharper_csharp_keep_existing_initializer_arrangement = true
+resharper_wrap_before_primary_constructor_declaration_rpar = true
+resharper_csharp_wrap_before_invocation_rpar = true
+resharper_csharp_wrap_before_declaration_rpar = true
