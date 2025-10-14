@@ -112,3 +112,8 @@
 
 **Business Value:**  
 Ускоряет старт и снижает барьер входа в приложение.
+
+---
+
+**Навигация:**  
+[← К списку UserStory](../UserStory.md) | [К следующей UserStory →](./UserStory.Transactions.md)
