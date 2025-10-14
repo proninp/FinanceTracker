@@ -186,12 +186,21 @@ Table category {
   }
 }
 
+Enum transaction_type {
+  income
+  expense
+}
+
 Table transactions {
   id uuid [pk]
   account_id uuid [ref: > account.id, not null]
   category_id uuid [ref: > category.id, not null]
+  type transaction_type
   amount decimal [not null]
+  date detetime [not null]
   description varchar [null]
+  place varchar [null]
+  transfer_id uuid [ref: > transfers.id]
   created_at timestamp [not null, default: `now()`]
 }
 
@@ -201,6 +210,7 @@ Table transfers {
   to_account_id uuid [ref: > account.id, not null]
   from_amount decimal [not null]
   to_amount decimal [not null, note: "When the from-account and the to-account have a different currencies"]
+  exchange_rate decimal [not null]
   description varchar [null]
   created_at timestamp [not null, default: `now()`]
 }
