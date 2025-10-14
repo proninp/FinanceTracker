@@ -105,10 +105,111 @@
 
 ---
 
-## 💡 Notes
+## 💡 Technical / UX Notes
 
 - Авторизация реализуется с помощью **JWT-токенов** (или cookies + refresh token).
 - Все пароли хранятся только в зашифрованном виде (bcrypt/argon2).
 - Поддерживается возможность "автоматического входа" через сохранённый токен.
 - Возможна интеграция с внешними провайдерами OAuth (Google, Apple ID) - как расширение.
 
+
+```sql
+Table user {
+  id uuid [pk]
+  role int [not null]
+  display_name varchar
+  first_name varchar
+  second_name varchar
+  last_name varchar
+  is_active boolean [default: true]
+  default_time_zone_id uuid [ref: > time_zone.id, null]
+  created_at timestamp [not null, default: `now()`]
+  created_by uuid [null]
+  updated_at timestamp [not null, default: `now()`]
+  updated_by uuid [null]
+  deleted_at timestamp [null]
+  deleted_by uuid [null]
+  is_deleted bool [not null]
+}
+
+Enum auth_provider_type {
+  email
+  telegram
+  OAuth2
+  Google
+  github
+  Apple
+}
+
+Table user_identity {
+  id uuid [pk]
+  user_id uuid [not null, ref: > user.id]
+  provider auth_provider_type [not null] 
+  identifier text [not null] // email, telegramId, OAut2 ID etc...
+  password_hash text // only used for password-based providers (e.g. 'email')
+  is_confirmed boolean [not null, default: false]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+
+    indexes {
+    (provider, identifier) [unique]
+  }
+}
+
+Table user_role {
+  id uuid [pk]
+  user_id uuid [not null, ref: > user.id] 
+  role_id uuid [not null, ref: > role.id]
+  indexes {
+    (user_id)
+    (role_id)
+  }
+}
+
+Table role {
+  id uuid [pk]
+  name varchar(256) [not null] 
+  is_active bool [not null]
+  is_default bool [not null]
+  claims jsonb [not null]
+  created_at timestamp [not null, default: `now()`]
+  created_by uuid [null]
+  updated_at timestamp [not null, default: `now()`]
+  updated_by uuid [null]
+  deleted_at timestamp [null]
+  deleted_by uuid [null]
+  is_deleted bool [not null]
+  indexes {
+    (name) [unique]
+  }
+}
+
+
+Table refresh_token {
+  id uuid [pk]
+  user_id uuid [not null, ref: > user.id]
+  token_hash text [not null]
+  expires_at timestamp [not null]
+  is_revoked boolean [not null, default: false]
+  created_at timestamp [not null, default: `now()`]
+  revoked_at timestamp [null]
+  last_used_at timestamp [null]
+  
+  indexes {
+    (token_hash) [unique]
+    (user_id)
+    (expires_at)
+  }
+}
+
+Table time_zone {
+  id uuid [pk]
+  iana_name varchar [not null, unique] // 'Europe/Moscow'
+  display_name varchar [not null]
+}
+```
+
+---
+
+**Навигация:**  
+[← К списку UserStory](../UserStory.md) | [К следующей UserStory →](./UserStory.Accounts.md)
