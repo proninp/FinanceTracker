@@ -191,7 +191,7 @@ Enum transaction_type {
   expense
 }
 
-Table transactions {
+Table transaction {
   id uuid [pk]
   account_id uuid [ref: > account.id, not null]
   category_id uuid [ref: > category.id, not null]
@@ -200,11 +200,11 @@ Table transactions {
   date detetime [not null]
   description varchar [null]
   place varchar [null]
-  transfer_id uuid [ref: > transfers.id]
+  transfer_id uuid [ref: > transfer.id]
   created_at timestamp [not null, default: `now()`]
 }
 
-Table transfers {
+Table transfer {
   id uuid [pk]
   from_account_id uuid [ref: > account.id, not null]
   to_account_id uuid [ref: > account.id, not null]
