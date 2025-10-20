@@ -57,6 +57,13 @@ indent_style = tab
 ## Code Quality Rules -- https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/quality-rules/
 
 [*.cs]
+
+### StyleCop Analyzers configuration
+# File must have header
+dotnet_diagnostic.SA1633.severity = none
+# Elements should be separated by blank line
+dotnet_diagnostic.SA1516.severity = none
+
 # свойства не должны быть доступны только на запись
 dotnet_diagnostic.CA1044.severity = error
 # объявляйте типы в пространствах имен
