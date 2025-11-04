@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="PageNumber">Номер запрашиваемой страницы (обычно начинается с 1).</param>
 /// <param name="PageSize">Количество элементов на одной странице.</param>
-public record PaginationSettings(int PageNumber, int PageSize)
+public sealed record PaginationSettings(int PageNumber, int PageSize)
 {
     /// <summary>
     /// Максимально допустимый размер страницы. Значение по умолчанию — 100.
