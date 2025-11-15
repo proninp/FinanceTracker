@@ -22,7 +22,12 @@ public interface ISoftDeletableEntity<TKey>
     bool IsDeleted { get; set; }
 
     /// <summary>
-    /// Восстанавливает удаленную сущность.
+    /// Восстановить сущность — сбросить флаги и метаданные удаления.
     /// </summary>
-    void Restore();
+    void Restore()
+    {
+        DeletedAt = null;
+        DeletedBy = null;
+        IsDeleted = false;
+    }
 }

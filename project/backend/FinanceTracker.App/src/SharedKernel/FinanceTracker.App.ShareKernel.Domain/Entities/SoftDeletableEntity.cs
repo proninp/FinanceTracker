@@ -19,14 +19,4 @@ public abstract class SoftDeletableEntity : AuditableEntity, ISoftDeletableEntit
     /// <inheritdoc />
     /// </summary>
     public bool IsDeleted { get; set; }
-
-    /// <summary>
-    /// <inheritdoc />
-    /// </summary>
-    public virtual void Restore()
-    {
-        DeletedAt = null;
-        DeletedBy = null;
-        IsDeleted = false;
-    }
 }
