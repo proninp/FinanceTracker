@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace FinanceTracker.App.ShareKernel.Domain.Entities;
 
 /// <summary>
@@ -7,15 +5,24 @@ namespace FinanceTracker.App.ShareKernel.Domain.Entities;
 /// </summary>
 public abstract class SoftDeletableEntity : AuditableEntity, ISoftDeletableEntity<Guid>
 {
-    [Column("deleted_at")]
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
     public DateTime? DeletedAt { get; set; }
 
-    [Column("deleted_by")]
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
     public Guid? DeletedBy { get; set; }
 
-    [Column("is_deleted")]
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
     public bool IsDeleted { get; set; }
 
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
     public virtual void Restore()
     {
         DeletedAt = null;
