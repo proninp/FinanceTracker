@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\SharedKernel\FinanceTracker.App.SharedKernel.Persistence\FinanceTracker.App.SharedKernel.Persistence.csproj" />
+      <ProjectReference Include="..\..\..\SharedKernel\FinanceTracker.App.ShareKernel.Domain\FinanceTracker.App.ShareKernel.Domain.csproj" />
     </ItemGroup>
 
 </Project>

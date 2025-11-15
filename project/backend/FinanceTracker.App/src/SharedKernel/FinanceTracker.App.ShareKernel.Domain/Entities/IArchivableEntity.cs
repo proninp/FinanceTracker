@@ -1,4 +1,4 @@
-﻿namespace FinanceTracker.App.SharedKernel.Contracts.Persistence;
+﻿namespace FinanceTracker.App.ShareKernel.Domain.Entities;
 
 public interface IArchivableEntity
 {

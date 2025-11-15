@@ -1,4 +1,4 @@
-﻿namespace FinanceTracker.App.SharedKernel.Contracts.Pagination;
+﻿namespace FinanceTracker.App.ShareKernel.Application.Pagination;
 
 /// <summary>
 /// Настройки выборки с использованием limit/offset: лимит, смещение и ограничение на максимальное количество результатов.

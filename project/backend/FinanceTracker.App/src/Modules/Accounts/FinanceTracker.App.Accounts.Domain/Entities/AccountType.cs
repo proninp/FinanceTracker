@@ -1,5 +1,4 @@
-﻿using FinanceTracker.App.SharedKernel.Contracts.Persistence;
-using FinanceTracker.App.SharedKernel.Persistence;
+﻿using FinanceTracker.App.ShareKernel.Domain.Entities;
 
 namespace FinanceTracker.App.Accounts.Domain.Entities;
 

@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using FinanceTracker.App.SharedKernel.Contracts.Persistence;
 
-namespace FinanceTracker.App.SharedKernel.Persistence;
+namespace FinanceTracker.App.ShareKernel.Domain.Entities;
 
 /// <summary>
 /// Базовый абстрактный класс для сущностей с аудитом создания и обновления.

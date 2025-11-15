@@ -1,6 +1,6 @@
-﻿using FinanceTracker.App.SharedKernel.Contracts.Persistence;
+﻿using FinanceTracker.App.ShareKernel.Domain.Entities;
 
-namespace FinanceTracker.App.SharedKernel.Contracts.Events;
+namespace FinanceTracker.App.ShareKernel.Domain.Events;
 
 /// <summary>
 /// Интерфейс для сущностей, содержащих события предметной области.

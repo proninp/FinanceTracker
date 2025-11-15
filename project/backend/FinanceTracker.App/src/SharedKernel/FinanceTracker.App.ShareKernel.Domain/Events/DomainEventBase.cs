@@ -1,4 +1,4 @@
-﻿namespace FinanceTracker.App.SharedKernel.Contracts.Events;
+﻿namespace FinanceTracker.App.ShareKernel.Domain.Events;
 
 /// <summary>
 /// Базовое событие предметной области.
