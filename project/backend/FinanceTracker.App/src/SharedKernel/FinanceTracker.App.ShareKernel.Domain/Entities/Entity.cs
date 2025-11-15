@@ -1,4 +1,4 @@
-﻿namespace FinanceTracker.App.SharedKernel.Persistence;
+﻿namespace FinanceTracker.App.ShareKernel.Domain.Entities;
 
 /// <summary>
 /// Базовый абстрактный класс для сущностей с полным набором функций:

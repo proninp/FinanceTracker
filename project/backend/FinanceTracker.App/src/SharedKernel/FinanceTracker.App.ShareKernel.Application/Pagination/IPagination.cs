@@ -1,4 +1,4 @@
-﻿namespace FinanceTracker.App.SharedKernel.Contracts.Pagination;
+﻿namespace FinanceTracker.App.ShareKernel.Application.Pagination;
 
 /// <summary>
 /// Интерфейс, обозначающий наличие настроек пагинации.
