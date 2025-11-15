@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\SharedKernel\FinanceTracker.App.SharedKernel.Persistence\FinanceTracker.App.SharedKernel.Persistence.csproj" />
+    </ItemGroup>
+
 </Project>
