@@ -1,23 +1,17 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace FinanceTracker.App.ShareKernel.Domain.Entities;
 
 /// <summary>
 /// Базовый абстрактный класс для сущностей с аудитом создания и обновления.
 /// </summary>
-public abstract class AuditableEntity : IAuditableEntity<Guid>, IEntity<Guid>
+public abstract class AuditableEntity : CreatableEntity, IUpdatableEntity<Guid>
 {
-    public Guid Id { get; init; }
-
-    [Column("created_at")]
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-
-    [Column("created_by")]
-    public Guid? CreatedBy { get; set; }
-
-    [Column("updated_at")]
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
     public DateTime UpdatedAt { get; set; }
 
-    [Column("updated_by")]
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
     public Guid? UpdatedBy { get; set; }
 }
