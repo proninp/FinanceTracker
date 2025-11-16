@@ -18,6 +18,11 @@ public class Account : Entity, IArchivableEntity
     public required Guid AccountTypeId { get; set; }
 
     /// <summary>
+    /// Тип счёта.
+    /// </summary>
+    public required AccountType AccountType { get; set; }
+
+    /// <summary>
     /// Идентификатор валюты счёта.
     /// </summary>
     public required Guid CurrencyId { get; set; }
