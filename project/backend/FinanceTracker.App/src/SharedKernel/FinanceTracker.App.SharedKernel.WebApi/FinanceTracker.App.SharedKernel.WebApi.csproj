@@ -7,7 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentResults" />
+      <ProjectReference Include="..\FinanceTracker.App.ShareKernel.Application\FinanceTracker.App.ShareKernel.Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" />
     </ItemGroup>
 
 </Project>
