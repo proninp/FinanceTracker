@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceTracker.App.SharedKernel.WebApi.Extensions;
 
-public static class ResultExtesions
+public static class ResultExtensions
 {
     /// <summary>
     /// Преобразует Result в IActionResult
