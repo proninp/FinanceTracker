@@ -30,7 +30,7 @@ public class Account : Entity, IArchivableEntity
     /// <summary>
     /// Внешний или связанный идентификатор (опционально).
     /// </summary>
-    public Guid? BakId { get; set; }
+    public Guid? BankId { get; set; }
 
     /// <summary>
     /// Название счёта.
