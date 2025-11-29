@@ -5,10 +5,16 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FinanceTracker.App.Infrastructure.EntityFramework.EntityMapping;
 
+/// <summary>
+/// Конфигурация маппинга для типов счетов.
+/// </summary>
 internal sealed class AccountTypeMapping : IEntityTypeConfiguration<AccountType>
 {
     public void Configure(EntityTypeBuilder<AccountType> builder)
     {
+        builder
+            .ToTable("account_type");
+
         builder
             .HasKey(x => x.Id);
 
@@ -55,12 +61,17 @@ internal sealed class AccountTypeMapping : IEntityTypeConfiguration<AccountType>
             .HasColumnName("is_deleted");
 
         // Seed data
+        SeedAccountTypes(builder);
+    }
+
+    private static void SeedAccountTypes(EntityTypeBuilder<AccountType> builder)
+    {
         var seedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         builder.HasData(
             new AccountType
             {
-                Id = new Guid("10000000-0000-0000-0000-000000000001"),
+                Id = SystemIdentifiers.BankAccountTypeId,
                 Code = "BANK",
                 Description = "Банковский счёт",
                 IsArchived = false,
@@ -74,7 +85,7 @@ internal sealed class AccountTypeMapping : IEntityTypeConfiguration<AccountType>
             },
             new AccountType
             {
-                Id = new Guid("10000000-0000-0000-0000-000000000002"),
+                Id = SystemIdentifiers.CashAccountTypeId,
                 Code = "CASH",
                 Description = "Наличные",
                 IsArchived = false,
@@ -88,9 +99,9 @@ internal sealed class AccountTypeMapping : IEntityTypeConfiguration<AccountType>
             },
             new AccountType
             {
-                Id = new Guid("10000000-0000-0000-0000-000000000003"),
-                Code = "CREDIT",
-                Description = "Кредитная карта",
+                Id = SystemIdentifiers.CardAccountTypeId,
+                Code = "CARD",
+                Description = "Карта",
                 IsArchived = false,
                 CreatedBy = SystemIdentifiers.SystemUserId,
                 CreatedAt = seedDate,
@@ -102,9 +113,23 @@ internal sealed class AccountTypeMapping : IEntityTypeConfiguration<AccountType>
             },
             new AccountType
             {
-                Id = new Guid("10000000-0000-0000-0000-000000000004"),
-                Code = "INVEST",
-                Description = "Инвестиционный счёт",
+                Id = SystemIdentifiers.CreditAccountTypeId,
+                Code = "CREDIT",
+                Description = "Кредит",
+                IsArchived = false,
+                CreatedBy = SystemIdentifiers.SystemUserId,
+                CreatedAt = seedDate,
+                UpdatedBy = null,
+                UpdatedAt = seedDate,
+                DeletedBy = null,
+                DeletedAt = null,
+                IsDeleted = false
+            },
+            new AccountType
+            {
+                Id = SystemIdentifiers.DepositAccountTypeId,
+                Code = "DEPOSIT",
+                Description = "Депозит",
                 IsArchived = false,
                 CreatedBy = SystemIdentifiers.SystemUserId,
                 CreatedAt = seedDate,

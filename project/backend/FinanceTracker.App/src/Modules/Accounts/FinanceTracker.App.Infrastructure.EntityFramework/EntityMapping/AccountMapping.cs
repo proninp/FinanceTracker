@@ -4,10 +4,16 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FinanceTracker.App.Infrastructure.EntityFramework.EntityMapping;
 
+/// <summary>
+/// Конфигурация маппинга для счетов.
+/// </summary>
 internal sealed class AccountMapping : IEntityTypeConfiguration<Account>
 {
     public void Configure(EntityTypeBuilder<Account> builder)
     {
+        builder
+            .ToTable("accounts");
+
         builder
             .HasKey(a => a.Id);
 

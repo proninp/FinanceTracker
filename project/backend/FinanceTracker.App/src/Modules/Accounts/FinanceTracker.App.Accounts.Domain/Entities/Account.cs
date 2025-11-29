@@ -1,11 +1,12 @@
 ﻿using FinanceTracker.App.ShareKernel.Domain.Entities;
+using FinanceTracker.App.ShareKernel.Domain.Localization;
 
 namespace FinanceTracker.App.Accounts.Domain.Entities;
 
 /// <summary>
 /// Сущность банковского/платёжного счёта пользователя.
 /// </summary>
-public class Account : Entity, IArchivableEntity
+public class Account : Entity, IArchivableEntity, ITranslatableEntity<AccountTranslation>
 {
     /// <summary>
     /// Идентификатор пользователя, которому принадлежит счёт.
@@ -56,4 +57,25 @@ public class Account : Entity, IArchivableEntity
     /// Флаг, указывающий, архивирован ли счёт.
     /// </summary>
     public bool IsArchived { get; set; }
+
+    /// <summary>
+    /// Коллекция переводов для разных языков.
+    /// </summary>
+    public ICollection<AccountTranslation> Translations { get; set; } = new List<AccountTranslation>();
+
+    /// <summary>
+    /// Получить описание на указанном языке.
+    /// Если перевод не найден, возвращается описание по умолчанию.
+    /// </summary>
+    public string GetName(string languageCode)
+    {
+        var translation = Translations.FirstOrDefault(t => t.LanguageCode == languageCode);
+        return translation?.Name ?? Name;
+    }
+
+    /// <summary>
+    /// Получить описание на указанном языке.
+    /// </summary>
+    public string GetName(Language language) =>
+        GetName(language.ToCode());
 }
