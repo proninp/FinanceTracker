@@ -285,5 +285,16 @@ __pycache__/
 hs_err_pid*
 replay_pid*
 
+*.Local.json
 appsettings.Local.json
 appsettings.*.Local.json
+
+# Secrets
+*.secrets
+.env.secrets
+.env.*.secrets
+secrets/
+*.secret.json
+
+.env.local
+.env.production.local
