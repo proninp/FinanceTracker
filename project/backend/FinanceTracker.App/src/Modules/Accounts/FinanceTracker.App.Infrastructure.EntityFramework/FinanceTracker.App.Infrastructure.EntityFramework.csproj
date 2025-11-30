@@ -14,6 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\SharedKernel\FinanceTracker.App.SharedKernel.Infrastructure\FinanceTracker.App.SharedKernel.Infrastructure.csproj" />
       <ProjectReference Include="..\FinanceTracker.App.Accounts.Domain\FinanceTracker.App.Accounts.Domain.csproj" />
     </ItemGroup>
 

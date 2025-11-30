@@ -1,4 +1,4 @@
-﻿using FinanceTracker.App.Infrastructure.EntityFramework.Options;
+﻿using FinanceTracker.App.SharedKernel.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +14,10 @@ public static class DependencyInjection
         bool isUseSensitiveLogging = false
     )
     {
-        services.Configure<AccountsDbSettings>(configuration.GetSection(nameof(AccountsDbSettings)));
+        services.Configure<DbSettings>(configuration.GetSection(nameof(DbSettings)));
         services.AddDbContext<AccountsDbContext>((provider, options) =>
             {
-                var dbSettings = provider.GetRequiredService<IOptions<AccountsDbSettings>>().Value;
+                var dbSettings = provider.GetRequiredService<IOptions<DbSettings>>().Value;
                 options.UseNpgsql(dbSettings.GetConnectionString());
                 if (isUseSensitiveLogging)
                 {

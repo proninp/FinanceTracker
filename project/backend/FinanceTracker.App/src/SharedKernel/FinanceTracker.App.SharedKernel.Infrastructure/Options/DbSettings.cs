@@ -1,6 +1,6 @@
-﻿namespace FinanceTracker.App.Infrastructure.EntityFramework.Options;
+﻿namespace FinanceTracker.App.SharedKernel.Infrastructure.Options;
 
-internal sealed class AccountsDbSettings
+public sealed class DbSettings
 {
     /// <summary>
     /// Хост базы данных.
