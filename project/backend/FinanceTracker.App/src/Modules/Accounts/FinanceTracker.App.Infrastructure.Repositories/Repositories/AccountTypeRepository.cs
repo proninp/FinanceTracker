@@ -2,6 +2,7 @@ using FinanceTracker.App.Accounts.Application.Contracts.Repositories;
 using FinanceTracker.App.Accounts.Domain.Entities;
 using FinanceTracker.App.Infrastructure.EntityFramework;
 using FinanceTracker.App.ShareKernel.Application.Pagination;
+using FinanceTracker.App.ShareKernel.Application.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.App.Infrastructure.Repositories.Repositories;
@@ -9,7 +10,10 @@ namespace FinanceTracker.App.Infrastructure.Repositories.Repositories;
 /// <summary>
 /// Реализация репозитория для работы с типами счетов.
 /// </summary>
-internal sealed class AccountTypeRepository(AccountsDbContext context) : IAccountTypeRepository
+internal sealed class AccountTypeRepository(
+    AccountsDbContext context,
+    IUnitOfWorkManager<AccountsDbContext> unitOfWorkManager
+) : IAccountTypeRepository
 {
     /// <summary>
     /// <inheritdoc/>
@@ -47,7 +51,8 @@ internal sealed class AccountTypeRepository(AccountsDbContext context) : IAccoun
     public async Task<PaginationResult<AccountType>> GetPagedAsync(
         PaginationSettings settings,
         bool includeArchived = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var query = context.AccountTypes.AsQueryable();
 
@@ -82,7 +87,8 @@ internal sealed class AccountTypeRepository(AccountsDbContext context) : IAccoun
     /// <returns><inheritdoc/></returns>
     public async Task<IReadOnlyList<AccountType>> GetAllAsync(
         bool includeArchived = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var query = context.AccountTypes.AsQueryable();
 
@@ -131,7 +137,8 @@ internal sealed class AccountTypeRepository(AccountsDbContext context) : IAccoun
     public async Task<AccountType> AddAsync(AccountType accountType, CancellationToken cancellationToken = default)
     {
         await context.AccountTypes.AddAsync(accountType, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        if (!unitOfWorkManager.IsUnitOfWorkStarted)
+            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
         return accountType;
     }
 
@@ -143,7 +150,8 @@ internal sealed class AccountTypeRepository(AccountsDbContext context) : IAccoun
     public async Task UpdateAsync(AccountType accountType, CancellationToken cancellationToken = default)
     {
         context.AccountTypes.Update(accountType);
-        await context.SaveChangesAsync(cancellationToken);
+        if (!unitOfWorkManager.IsUnitOfWorkStarted)
+            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -154,7 +162,8 @@ internal sealed class AccountTypeRepository(AccountsDbContext context) : IAccoun
     public async Task DeleteAsync(AccountType accountType, CancellationToken cancellationToken = default)
     {
         context.AccountTypes.Remove(accountType);
-        await context.SaveChangesAsync(cancellationToken);
+        if (!unitOfWorkManager.IsUnitOfWorkStarted)
+            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -165,7 +174,8 @@ internal sealed class AccountTypeRepository(AccountsDbContext context) : IAccoun
     /// <returns><inheritdoc/></returns>
     public async Task<IReadOnlyList<AccountType>> GetAllIncludingDeletedAsync(
         bool includeArchived = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var query = context.AccountTypes
             .IgnoreQueryFilters();

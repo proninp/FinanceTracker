@@ -1,9 +1,10 @@
 ﻿using FinanceTracker.App.Accounts.Domain.Entities;
+using FinanceTracker.App.ShareKernel.Application.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.App.Infrastructure.EntityFramework;
 
-public sealed class AccountsDbContext(DbContextOptions<AccountsDbContext> options) : DbContext(options)
+public sealed class AccountsDbContext(DbContextOptions<AccountsDbContext> options) : DbContext(options), IDbContext
 {
     public DbSet<Account> Accounts => Set<Account>();
 

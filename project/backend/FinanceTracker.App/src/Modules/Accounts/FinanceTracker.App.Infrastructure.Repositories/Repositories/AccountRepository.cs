@@ -2,6 +2,7 @@ using FinanceTracker.App.Accounts.Application.Contracts.Repositories;
 using FinanceTracker.App.Accounts.Domain.Entities;
 using FinanceTracker.App.Infrastructure.EntityFramework;
 using FinanceTracker.App.ShareKernel.Application.Pagination;
+using FinanceTracker.App.ShareKernel.Application.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.App.Infrastructure.Repositories.Repositories;
@@ -9,7 +10,10 @@ namespace FinanceTracker.App.Infrastructure.Repositories.Repositories;
 /// <summary>
 /// Реализация репозитория для работы со счетами.
 /// </summary>
-internal sealed class AccountRepository(AccountsDbContext context) : IAccountRepository
+internal sealed class AccountRepository(
+    AccountsDbContext context,
+    IUnitOfWorkManager<AccountsDbContext> unitOfWorkManager
+) : IAccountRepository
 {
     /// <summary>
     /// <inheritdoc/>
@@ -21,7 +25,7 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     {
         return await context.Accounts
             .Include(a => a.AccountType)
-                .ThenInclude(at => at.Translations)
+            .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
@@ -37,7 +41,7 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     {
         return await context.Accounts
             .Include(a => a.AccountType)
-                .ThenInclude(at => at.Translations)
+            .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
             .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId, cancellationToken);
     }
@@ -52,7 +56,8 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     public async Task<PaginationResult<Account>> GetPagedAsync(
         PaginationSettings settings,
         bool includeArchived = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var query = context.Accounts.AsQueryable();
 
@@ -64,7 +69,7 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
         query = query
             .Include(a => a.Translations)
             .Include(a => a.AccountType)
-                .ThenInclude(at => at.Translations);
+            .ThenInclude(at => at.Translations);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -92,11 +97,12 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     public async Task<IReadOnlyList<Account>> GetUserAccountsAsync(
         Guid userId,
         bool includeArchived = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var query = context.Accounts
             .Include(a => a.AccountType)
-                .ThenInclude(at => at.Translations)
+            .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
             .Where(a => a.UserId == userId);
 
@@ -120,7 +126,7 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     {
         return await context.Accounts
             .Include(a => a.AccountType)
-                .ThenInclude(at => at.Translations)
+            .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
             .FirstOrDefaultAsync(a => a.UserId == userId && a.IsDefault, cancellationToken);
     }
@@ -159,7 +165,8 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     public async Task<Account> AddAsync(Account account, CancellationToken cancellationToken = default)
     {
         await context.Accounts.AddAsync(account, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        if (!unitOfWorkManager.IsUnitOfWorkStarted)
+            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
         return account;
     }
 
@@ -171,7 +178,8 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     public async Task UpdateAsync(Account account, CancellationToken cancellationToken = default)
     {
         context.Accounts.Update(account);
-        await context.SaveChangesAsync(cancellationToken);
+        if (!unitOfWorkManager.IsUnitOfWorkStarted)
+            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -182,7 +190,8 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     public async Task DeleteAsync(Account account, CancellationToken cancellationToken = default)
     {
         context.Accounts.Remove(account);
-        await context.SaveChangesAsync(cancellationToken);
+        if (!unitOfWorkManager.IsUnitOfWorkStarted)
+            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -215,12 +224,13 @@ internal sealed class AccountRepository(AccountsDbContext context) : IAccountRep
     public async Task<IReadOnlyList<Account>> GetUserAccountsIncludingDeletedAsync(
         Guid userId,
         bool includeArchived = false,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var query = context.Accounts
             .IgnoreQueryFilters()
             .Include(a => a.AccountType)
-                .ThenInclude(at => at.Translations)
+            .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
             .Where(a => a.UserId == userId);
 
