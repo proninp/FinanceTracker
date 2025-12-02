@@ -94,5 +94,8 @@ internal sealed class AccountMapping : IEntityTypeConfiguration<Account>
         builder.Property(a => a.IsDeleted)
             .IsRequired()
             .HasColumnName("is_deleted");
+
+        // Global query filter for soft delete
+        builder.HasQueryFilter(a => !a.IsDeleted);
     }
 }
