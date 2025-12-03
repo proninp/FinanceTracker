@@ -19,16 +19,20 @@ internal sealed class AccountRepository(
     /// <inheritdoc/>
     /// </summary>
     /// <param name="id"><inheritdoc/></param>
+    /// <param name="languageCode"></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
-    public async Task<Account?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Account?> GetByIdAsync(
+        Guid id,
+        string? languageCode = null,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context.Accounts
-            .AsNoTracking()
-            .Include(a => a.AccountType)
-            .ThenInclude(at => at.Translations)
-            .Include(a => a.Translations)
-            .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+        var query = context.Accounts.AsNoTracking();
+
+        query = IncludeTranslationsByLanguage(languageCode, query);
+
+        return await query.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
     /// <summary>
@@ -36,27 +40,35 @@ internal sealed class AccountRepository(
     /// </summary>
     /// <param name="id"><inheritdoc/></param>
     /// <param name="userId"><inheritdoc/></param>
+    /// <param name="languageCode"></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
-    public async Task<Account?> GetByIdForUserAsync(Guid id, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<Account?> GetByIdForUserAsync(
+        Guid id,
+        Guid userId,
+        string? languageCode = null,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context.Accounts
-            .AsNoTracking()
-            .Include(a => a.AccountType)
-            .ThenInclude(at => at.Translations)
-            .Include(a => a.Translations)
-            .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId, cancellationToken);
+        var query = context.Accounts.AsNoTracking()
+            .Where(a => a.Id == id && a.UserId == userId);
+
+        query = IncludeTranslationsByLanguage(languageCode, query);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="settings"><inheritdoc/></param>
+    /// <param name="languageCode"></param>
     /// <param name="includeArchived"><inheritdoc/></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
     public async Task<PaginationResult<Account>> GetPagedAsync(
         PaginationSettings settings,
+        string? languageCode = null,
         bool includeArchived = false,
         CancellationToken cancellationToken = default
     )
@@ -68,10 +80,7 @@ internal sealed class AccountRepository(
             query = query.Where(a => !a.IsArchived);
         }
 
-        query = query
-            .Include(a => a.Translations)
-            .Include(a => a.AccountType)
-            .ThenInclude(at => at.Translations);
+        query = IncludeTranslationsByLanguage(languageCode, query);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -93,26 +102,27 @@ internal sealed class AccountRepository(
     /// <inheritdoc/>
     /// </summary>
     /// <param name="userId"><inheritdoc/></param>
+    /// <param name="languageCode"></param>
     /// <param name="includeArchived"><inheritdoc/></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
     public async Task<IReadOnlyList<Account>> GetUserAccountsAsync(
         Guid userId,
+        string? languageCode = null,
         bool includeArchived = false,
         CancellationToken cancellationToken = default
     )
     {
         var query = context.Accounts
             .AsNoTracking()
-            .Include(a => a.AccountType)
-            .ThenInclude(at => at.Translations)
-            .Include(a => a.Translations)
             .Where(a => a.UserId == userId);
 
         if (!includeArchived)
         {
             query = query.Where(a => !a.IsArchived);
         }
+
+        query = IncludeTranslationsByLanguage(languageCode, query);
 
         return await query
             .OrderBy(a => a.Name)
@@ -123,16 +133,22 @@ internal sealed class AccountRepository(
     /// <inheritdoc/>
     /// </summary>
     /// <param name="userId"><inheritdoc/></param>
+    /// <param name="languageCode"></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
-    public async Task<Account?> GetDefaultAccountForUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<Account?> GetDefaultAccountForUserAsync(
+        Guid userId,
+        string? languageCode,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context.Accounts
+        var query = context.Accounts
             .AsNoTracking()
-            .Include(a => a.AccountType)
-            .ThenInclude(at => at.Translations)
-            .Include(a => a.Translations)
-            .FirstOrDefaultAsync(a => a.UserId == userId && a.IsDefault, cancellationToken);
+            .Where(a => a.UserId == userId && a.IsDefault);
+
+        query = IncludeTranslationsByLanguage(languageCode, query);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>
@@ -225,11 +241,13 @@ internal sealed class AccountRepository(
     /// <inheritdoc/>
     /// </summary>
     /// <param name="userId"><inheritdoc/></param>
+    /// <param name="languageCode"></param>
     /// <param name="includeArchived"><inheritdoc/></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
     public async Task<IReadOnlyList<Account>> GetUserAccountsIncludingDeletedAsync(
         Guid userId,
+        string? languageCode,
         bool includeArchived = false,
         CancellationToken cancellationToken = default
     )
@@ -237,9 +255,6 @@ internal sealed class AccountRepository(
         var query = context.Accounts
             .IgnoreQueryFilters()
             .AsNoTracking()
-            .Include(a => a.AccountType)
-            .ThenInclude(at => at.Translations)
-            .Include(a => a.Translations)
             .Where(a => a.UserId == userId);
 
         if (!includeArchived)
@@ -247,8 +262,31 @@ internal sealed class AccountRepository(
             query = query.Where(a => !a.IsArchived);
         }
 
+        query = IncludeTranslationsByLanguage(languageCode, query);
+
         return await query
             .OrderBy(a => a.Name)
             .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Включает связанные переводы аккаунтов и их типов, optionally фильтруя их по указанному языковому коду.
+    /// </summary>
+    /// <param name="languageCode">Код языка (например, "en" или "ru"). Если не указан — включаются все переводы.</param>
+    /// <param name="query">Исходный запрос к сущностям <see cref="Account"/>.</param>
+    /// <returns>
+    /// Запрос с подключёнными навигационными свойствами <c>Translations</c> и, при необходимости, отфильтрованными по языковому коду.
+    /// </returns>
+    private IQueryable<Account> IncludeTranslationsByLanguage(string? languageCode, IQueryable<Account> query)
+    {
+        return !string.IsNullOrWhiteSpace(languageCode)
+            ? query
+                .Include(a => a.AccountType)
+                    .ThenInclude(at => at.Translations.Where(t => t.LanguageCode == languageCode))
+                .Include(a => a.Translations.Where(t => t.LanguageCode == languageCode))
+            : query
+                .Include(a => a.AccountType)
+                    .ThenInclude(at => at.Translations)
+                .Include(a => a.Translations);
     }
 }

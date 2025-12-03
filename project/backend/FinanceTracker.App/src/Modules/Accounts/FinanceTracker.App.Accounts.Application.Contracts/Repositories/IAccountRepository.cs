@@ -12,50 +12,72 @@ public interface IAccountRepository
     /// Получить счёт по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор счёта.</param>
+    /// <param name="languageCode">
+    /// Код языка для фильтрации переводов связанных сущностей
+    /// (например, "en" или "ru"). Если не указан — возвращаются все переводы.
+    /// </param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Сущность Account или null, если не найдена.</returns>
-    Task<Account?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Account?> GetByIdAsync(Guid id, string? languageCode = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Получить счёт по идентификатору, принадлежащий указанному пользователю.
     /// </summary>
     /// <param name="id">Идентификатор счёта.</param>
     /// <param name="userId">Идентификатор пользователя-владельца.</param>
+    /// <param name="languageCode">
+    /// Код языка для фильтрации переводов связанных сущностей
+    /// (например, "en" или "ru"). Если не указан — возвращаются все переводы.
+    /// </param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Сущность Account или null, если не найдена или не принадлежит пользователю.</returns>
-    Task<Account?> GetByIdForUserAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
+    Task<Account?> GetByIdForUserAsync(Guid id, Guid userId, string? languageCode = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Получить постраничный список счётов.
     /// </summary>
     /// <param name="settings">Настройки пагинации.</param>
+    /// <param name="languageCode">
+    /// Код языка для фильтрации переводов связанных сущностей
+    /// (например, "en" или "ru"). Если не указан — возвращаются все переводы.
+    /// </param>
     /// <param name="includeArchived">Включать ли архивные счёта.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Результат пагинации со списком Account.</returns>
-    Task<PaginationResult<Account>> GetPagedAsync(
-        PaginationSettings settings,
+    Task<PaginationResult<Account>> GetPagedAsync(PaginationSettings settings,
+        string? languageCode = null,
         bool includeArchived = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Получить список счётов пользователя.
     /// </summary>
     /// <param name="userId">Идентификатор пользователя.</param>
+    /// <param name="languageCode">
+    /// Код языка для фильтрации переводов связанных сущностей
+    /// (например, "en" или "ru"). Если не указан — возвращаются все переводы.
+    /// </param>
     /// <param name="includeArchived">Включать ли архивные счёта.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Список сущностей Account.</returns>
-    Task<IReadOnlyList<Account>> GetUserAccountsAsync(
-        Guid userId,
+    Task<IReadOnlyList<Account>> GetUserAccountsAsync(Guid userId,
+        string? languageCode = null,
         bool includeArchived = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Получить счёт по умолчанию для пользователя.
     /// </summary>
     /// <param name="userId">Идентификатор пользователя.</param>
+    /// <param name="languageCode">
+    /// Код языка для фильтрации переводов связанных сущностей
+    /// (например, "en" или "ru"). Если не указан — возвращаются все переводы.
+    /// </param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Сущность Account или null, если не задан.</returns>
-    Task<Account?> GetDefaultAccountForUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<Account?> GetDefaultAccountForUserAsync(Guid userId, string? languageCode, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Проверить существование счёта по идентификатору.
@@ -109,11 +131,16 @@ public interface IAccountRepository
     /// Получить все счёта пользователя, включая удалённые при необходимости.
     /// </summary>
     /// <param name="userId">Идентификатор пользователя.</param>
+    /// <param name="languageCode">
+    /// Код языка для фильтрации переводов связанных сущностей
+    /// (например, "en" или "ru"). Если не указан — возвращаются все переводы.
+    /// </param>
     /// <param name="includeArchived">Включать ли архивные и/или удалённые счёта.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Список сущностей Account.</returns>
-    Task<IReadOnlyList<Account>> GetUserAccountsIncludingDeletedAsync(
-        Guid userId,
+    Task<IReadOnlyList<Account>> GetUserAccountsIncludingDeletedAsync(Guid userId,
+        string? languageCode,
         bool includeArchived = false,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }

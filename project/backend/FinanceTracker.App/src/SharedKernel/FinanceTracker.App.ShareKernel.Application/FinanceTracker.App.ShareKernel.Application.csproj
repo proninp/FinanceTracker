@@ -8,6 +8,11 @@
 
     <ItemGroup>
       <PackageReference Include="FluentResults" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FinanceTracker.App.ShareKernel.Domain\FinanceTracker.App.ShareKernel.Domain.csproj" />
     </ItemGroup>
 
 </Project>
