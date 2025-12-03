@@ -24,6 +24,7 @@ internal sealed class AccountTypeRepository(
     public async Task<AccountType?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.AccountTypes
+            .AsNoTracking()
             .Include(at => at.Translations)
             .FirstOrDefaultAsync(at => at.Id == id, cancellationToken);
     }
@@ -37,6 +38,7 @@ internal sealed class AccountTypeRepository(
     public async Task<AccountType?> GetByCodeAsync(string code, CancellationToken cancellationToken = default)
     {
         return await context.AccountTypes
+            .AsNoTracking()
             .Include(at => at.Translations)
             .FirstOrDefaultAsync(at => at.Code == code, cancellationToken);
     }
@@ -54,7 +56,7 @@ internal sealed class AccountTypeRepository(
         CancellationToken cancellationToken = default
     )
     {
-        var query = context.AccountTypes.AsQueryable();
+        var query = context.AccountTypes.AsNoTracking();
 
         if (!includeArchived)
         {
@@ -90,7 +92,7 @@ internal sealed class AccountTypeRepository(
         CancellationToken cancellationToken = default
     )
     {
-        var query = context.AccountTypes.AsQueryable();
+        var query = context.AccountTypes.AsNoTracking();
 
         if (!includeArchived)
         {
@@ -113,6 +115,7 @@ internal sealed class AccountTypeRepository(
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.AccountTypes
+            .AsNoTracking()
             .AnyAsync(at => at.Id == id, cancellationToken);
     }
 
@@ -125,6 +128,7 @@ internal sealed class AccountTypeRepository(
     public async Task<bool> ExistsByCodeAsync(string code, CancellationToken cancellationToken = default)
     {
         return await context.AccountTypes
+            .AsNoTracking()
             .AnyAsync(at => at.Code == code, cancellationToken);
     }
 
@@ -178,7 +182,8 @@ internal sealed class AccountTypeRepository(
     )
     {
         var query = context.AccountTypes
-            .IgnoreQueryFilters();
+            .IgnoreQueryFilters()
+            .AsNoTracking();
 
         if (!includeArchived)
         {

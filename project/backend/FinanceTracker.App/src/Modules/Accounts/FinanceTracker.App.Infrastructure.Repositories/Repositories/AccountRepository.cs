@@ -24,6 +24,7 @@ internal sealed class AccountRepository(
     public async Task<Account?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.Accounts
+            .AsNoTracking()
             .Include(a => a.AccountType)
             .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
@@ -40,6 +41,7 @@ internal sealed class AccountRepository(
     public async Task<Account?> GetByIdForUserAsync(Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Accounts
+            .AsNoTracking()
             .Include(a => a.AccountType)
             .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
@@ -59,7 +61,7 @@ internal sealed class AccountRepository(
         CancellationToken cancellationToken = default
     )
     {
-        var query = context.Accounts.AsQueryable();
+        var query = context.Accounts.AsNoTracking();
 
         if (!includeArchived)
         {
@@ -101,6 +103,7 @@ internal sealed class AccountRepository(
     )
     {
         var query = context.Accounts
+            .AsNoTracking()
             .Include(a => a.AccountType)
             .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
@@ -125,6 +128,7 @@ internal sealed class AccountRepository(
     public async Task<Account?> GetDefaultAccountForUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Accounts
+            .AsNoTracking()
             .Include(a => a.AccountType)
             .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
@@ -140,6 +144,7 @@ internal sealed class AccountRepository(
     public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.Accounts
+            .AsNoTracking()
             .AnyAsync(a => a.Id == id, cancellationToken);
     }
 
@@ -153,6 +158,7 @@ internal sealed class AccountRepository(
     public async Task<bool> IsUserAccountOwnerAsync(Guid accountId, Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.Accounts
+            .AsNoTracking()
             .AnyAsync(a => a.Id == accountId && a.UserId == userId, cancellationToken);
     }
 
@@ -204,6 +210,7 @@ internal sealed class AccountRepository(
     public async Task<int> CountUserAccountsAsync(Guid userId, bool includeArchived = false, CancellationToken cancellationToken = default)
     {
         var query = context.Accounts
+            .AsNoTracking()
             .Where(a => a.UserId == userId);
 
         if (!includeArchived)
@@ -229,6 +236,7 @@ internal sealed class AccountRepository(
     {
         var query = context.Accounts
             .IgnoreQueryFilters()
+            .AsNoTracking()
             .Include(a => a.AccountType)
             .ThenInclude(at => at.Translations)
             .Include(a => a.Translations)
