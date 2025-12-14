@@ -10,5 +10,9 @@ public sealed record UpdateAccountTypeDto
 
     public bool IsArchived { get; init; }
 
+    /// <summary>
+    /// Переводы. Если указаны - заменяют все существующие переводы.
+    /// Если null - переводы не изменяются.
+    /// </summary>
     public ICollection<AccountTypeTranslationDto>? Translations { get; init; }
 }
