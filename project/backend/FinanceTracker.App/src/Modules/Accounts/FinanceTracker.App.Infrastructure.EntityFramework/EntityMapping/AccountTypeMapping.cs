@@ -60,6 +60,9 @@ internal sealed class AccountTypeMapping : IEntityTypeConfiguration<AccountType>
             .IsRequired()
             .HasColumnName("is_deleted");
 
+        // Global query filter for soft delete
+        builder.HasQueryFilter(at => !at.IsDeleted);
+
         // Seed data
         SeedAccountTypes(builder);
     }
