@@ -1,12 +1,10 @@
-﻿using FinanceTracker.App.ShareKernel.Application.Data;
-
-namespace FinanceTracker.App.ShareKernel.Application.UnitOfWork;
+﻿namespace FinanceTracker.App.ShareKernel.Application.UnitOfWork;
 
 /// <summary>
 /// Менеджер единицы работы (Unit of Work).
 /// Отвечает за управление жизненным циклом и сохранением изменений.
 /// </summary>
-public interface IUnitOfWorkManager<TContext> where TContext : IDbContext
+public interface IUnitOfWorkManager
 {
     /// <summary>
     /// Запускает новую единицу работы, в рамках которой отслеживаются изменения.

@@ -6,9 +6,9 @@ namespace FinanceTracker.App.SharedKernel.Infrastructure.UnitOfWork;
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-/// <param name="context"><inheritdoc/></param>
-/// <typeparam name="TContext"><inheritdoc/></typeparam>
-public sealed class UnitOfWorkManager<TContext>(TContext context) : IUnitOfWorkManager<TContext>
+/// <param name="context">Экземпляр контекста базы данных, используемый менеджером для выполнения операций сохранения.</param>
+/// <typeparam name="TContext">Тип контекста базы данных, реализует <see cref="IDbContext"/>.</typeparam>
+public abstract class UnitOfWorkManager<TContext>(TContext context) : IUnitOfWorkManager
     where TContext : IDbContext
 {
     /// <summary>

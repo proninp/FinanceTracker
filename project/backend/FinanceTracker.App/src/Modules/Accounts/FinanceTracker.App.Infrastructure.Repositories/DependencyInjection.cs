@@ -1,4 +1,6 @@
 using FinanceTracker.App.Accounts.Application.Contracts.Repositories;
+using FinanceTracker.App.Accounts.Application.Contracts.UnitOfWork;
+using FinanceTracker.App.Infrastructure.EntityFramework;
 using FinanceTracker.App.Infrastructure.Repositories.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +18,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IAccountTypeRepository, AccountTypeRepository>();
+        services.AddScoped<IAccountsUnitOfWorkManager, AccountsUnitOfWorkManager>();
 
         return services;
     }
