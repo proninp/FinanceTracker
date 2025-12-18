@@ -58,6 +58,8 @@ indent_style = tab
 
 [*.cs]
 
+max_line_length = 120
+
 # свойства не должны быть доступны только на запись
 dotnet_diagnostic.CA1044.severity = error
 # объявляйте типы в пространствах имен
@@ -159,8 +161,6 @@ dotnet_diagnostic.IDE0240.severity = error
 dotnet_diagnostic.IDE0303.severity = error
 ### IDE2000: пустые строки
 dotnet_diagnostic.IDE2000.severity = error
-
-
 ## Fixing formating  https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/style-rules/csharp-formatting-options
 dotnet_diagnostic.IDE0055.severity = warning
 

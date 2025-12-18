@@ -72,3 +72,19 @@ public sealed record PaginationResult<T>
             TotalCount = 0
         };
 }
+
+
+public static class PaginationResultExtensions
+{
+    public static PaginationResult<TDto> ToPaginationResult<TDto, T>(
+        this PaginationResult<T> result,
+        PaginationSettings settings,
+        Func<T, TDto> selector)
+    {
+        return new PaginationResult<TDto>(
+            result.Data.Select(selector).ToList(),
+            settings,
+            result.TotalCount
+        );
+    }
+}

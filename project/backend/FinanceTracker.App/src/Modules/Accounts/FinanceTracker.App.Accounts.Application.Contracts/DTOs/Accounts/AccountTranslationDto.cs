@@ -1,8 +1,44 @@
-﻿namespace FinanceTracker.App.Accounts.Application.Contracts.DTOs.Accounts;
+﻿using FinanceTracker.App.Accounts.Application.Contracts.DTOs.AccountTypes;
+using FinanceTracker.App.Accounts.Domain.Entities;
+using FinanceTracker.App.ShareKernel.Application.Localization;
 
-public sealed record AccountTranslationDto
+namespace FinanceTracker.App.Accounts.Application.Contracts.DTOs.Accounts;
+
+/// <summary>
+/// DTO перевода наименования счёта на определённый язык.
+/// </summary>
+public sealed record AccountTranslationDto : TranslationDto
 {
-    public required string LanguageCode { get; init; }
-
+    /// <summary>
+    /// Наименование счёта на соответствующем языке.
+    /// </summary>
     public required string Name { get; init; }
+}
+
+/// <summary>
+/// Методы расширения для преобразования DTO перевода типа счёта в доменную модель.
+/// </summary>
+public static class AccountTranslationDtoExtensions
+{
+    /// <summary>
+    /// Преобразует DTO перевода типа счёта в доменную модель перевода.
+    /// </summary>
+    /// <param name="dto">
+    /// DTO перевода типа счёта.
+    /// </param>
+    /// <param name="accountTypeId">
+    /// Идентификатор типа счёта, к которому относится перевод.
+    /// </param>
+    /// <returns>
+    /// Доменная модель перевода типа счёта.
+    /// </returns>
+    public static AccountTypeTranslation ToModel(this AccountTypeTranslationDto dto, Guid accountTypeId)
+    {
+        return new AccountTypeTranslation
+        {
+            EntityId = accountTypeId,
+            LanguageCode = dto.LanguageCode,
+            Description = dto.Description.Trim()
+        };
+    }
 }
