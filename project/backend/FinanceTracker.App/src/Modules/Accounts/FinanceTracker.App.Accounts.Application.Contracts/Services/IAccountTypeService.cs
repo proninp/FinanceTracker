@@ -12,12 +12,12 @@ public interface IAccountTypeService
     /// <summary>
     /// Возвращает тип счёта по идентификатору.
     /// </summary>
-    Task<Result<AccountTypeDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Result<AccountTypeDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Возвращает тип счёта по коду.
     /// </summary>
-    Task<Result<AccountTypeDto?>> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
+    Task<Result<AccountTypeDto>> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Возвращает постраничный список типов счётов.
