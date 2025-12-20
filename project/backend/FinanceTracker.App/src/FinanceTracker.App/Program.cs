@@ -8,7 +8,7 @@ builder.Configuration.AddJsonFile(
     reloadOnChange: true
 );
 
-builder.Host.AddLogging(builder.Configuration);
+builder.Host.AddLogging();
 
 builder.Services.AddControllers();
 

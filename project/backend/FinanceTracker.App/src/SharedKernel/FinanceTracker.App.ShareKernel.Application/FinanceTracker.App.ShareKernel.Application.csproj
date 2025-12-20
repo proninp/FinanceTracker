@@ -12,6 +12,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReferenceF Include="..\FinanceTracker.App.ShareKernel.Domain\FinanceTracker.App.ShareKernel.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\FinanceTracker.App.ShareKernel.Domain\FinanceTracker.App.ShareKernel.Domain.csproj" />
     </ItemGroup>
 

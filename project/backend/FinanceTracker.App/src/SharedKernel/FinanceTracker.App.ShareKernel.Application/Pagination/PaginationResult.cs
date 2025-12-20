@@ -73,7 +73,6 @@ public sealed record PaginationResult<T>
         };
 }
 
-
 public static class PaginationResultExtensions
 {
     public static PaginationResult<TDto> ToPaginationResult<TDto, T>(

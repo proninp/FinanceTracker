@@ -1,4 +1,5 @@
-﻿using FinanceTracker.App.SharedKernel.WebApi.Localization;
+﻿using FinanceTracker.App.SharedKernel.Infrastructure;
+using FinanceTracker.App.SharedKernel.WebApi.Localization;
 using FinanceTracker.App.ShareKernel.Application.Localization;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,8 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         services.AddScoped<ILanguageContext, HttpLanguageContext>();
+
+        services.AddInfrastructure();
 
         return services;
     }

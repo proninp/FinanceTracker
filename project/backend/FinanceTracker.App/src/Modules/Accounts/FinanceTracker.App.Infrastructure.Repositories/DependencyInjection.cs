@@ -1,7 +1,7 @@
 using FinanceTracker.App.Accounts.Application.Contracts.Repositories;
 using FinanceTracker.App.Accounts.Application.Contracts.UnitOfWork;
-using FinanceTracker.App.Infrastructure.EntityFramework;
 using FinanceTracker.App.Infrastructure.Repositories.Repositories;
+using FinanceTracker.App.Infrastructure.Repositories.UnitOfWork;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FinanceTracker.App.Infrastructure.Repositories;

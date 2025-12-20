@@ -4,7 +4,7 @@ namespace FinanceTracker.App.DependencyInjection;
 
 public static class AppInstaller
 {
-    public static IHostBuilder AddLogging(this IHostBuilder hostBuilder, IConfiguration configuration)
+    public static IHostBuilder AddLogging(this IHostBuilder hostBuilder)
     {
         return hostBuilder.UseSerilog((context, loggerConfig) =>
             loggerConfig

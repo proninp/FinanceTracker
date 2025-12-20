@@ -7,12 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\FinanceTracker.App.SharedKernel.Infrastructure\FinanceTracker.App.SharedKernel.Infrastructure.csproj" />
       <ProjectReference Include="..\FinanceTracker.App.ShareKernel.Application\FinanceTracker.App.ShareKernel.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" />
       <PackageReference Include="Microsoft.Extensions.Primitives" />
+      <PackageReference Include="Newtonsoft.Json" />
     </ItemGroup>
 
 </Project>
