@@ -26,17 +26,17 @@ public static class AccountTranslationDtoExtensions
     /// <param name="dto">
     /// DTO перевода типа счёта.
     /// </param>
-    /// <param name="accountTypeId">
+    /// <param name="accountId">
     /// Идентификатор типа счёта, к которому относится перевод.
     /// </param>
     /// <returns>
     /// Доменная модель перевода типа счёта.
     /// </returns>
-    public static AccountTypeTranslation ToModel(this AccountTypeTranslationDto dto, Guid accountTypeId)
+    public static AccountTypeTranslation ToModel(this AccountTypeTranslationDto dto, Guid accountId)
     {
         return new AccountTypeTranslation
         {
-            EntityId = accountTypeId,
+            EntityId = accountId,
             LanguageCode = dto.LanguageCode,
             Description = dto.Description.Trim()
         };
