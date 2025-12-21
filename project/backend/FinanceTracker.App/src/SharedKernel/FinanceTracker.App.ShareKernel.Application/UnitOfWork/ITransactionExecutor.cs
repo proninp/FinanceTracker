@@ -14,13 +14,21 @@ public interface ITransactionExecutor
     /// </summary>
     /// <typeparam name="T">Dto тип результата операции.</typeparam>
     /// <param name="operation">Асинхронная операция для выполнения.</param>
+    /// <param name="informationLogDescription">
+    /// Описание информационного сообщения, используемое при формировании лога в случае успешного выполнения.
+    /// </param>
     /// <param name="errorDescription">
     /// Описание ошибки, используемое при формировании результата в случае сбоя выполнения.
+    /// </param>
+    /// <param name="errorLogDescription">
+    /// Описание сообщения об ошибке, используемое при формировании лога в случае сбоя выполнения.
     /// </param>
     /// <param name="cancellationToken">Токен отмены операции.</param>
     /// <returns>Результат выполнения операции.</returns>
     public Task<Result<T>> ExecuteAsync<T>(Func<Task<T>> operation,
+        string? informationLogDescription,
         string errorDescription,
+        string errorLogDescription,
         CancellationToken cancellationToken = default
     );
 
@@ -29,13 +37,21 @@ public interface ITransactionExecutor
     /// в транзакционном контексте с единообразной обработкой ошибок.
     /// </summary>
     /// <param name="operation">Асинхронная операция для выполнения.</param>
+    /// <param name="informationLogDescription">
+    /// Описание информационного сообщения, используемое при формировании лога в случае успешного выполнения.
+    /// </param>
     /// <param name="errorDescription">
     /// Описание ошибки, используемое при формировании результата в случае сбоя выполнения.
+    /// </param>
+    /// <param name="errorLogDescription">
+    /// Описание сообщения об ошибке, используемое при формировании лога в случае сбоя выполнения.
     /// </param>
     /// <param name="cancellationToken">Токен отмены операции.</param>
     /// <returns>Результат выполнения операции.</returns>
     Task<Result> ExecuteAsync(Func<Task> operation,
+        string? informationLogDescription,
         string errorDescription,
+        string errorLogDescription,
         CancellationToken cancellationToken = default
     );
 }

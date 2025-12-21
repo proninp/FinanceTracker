@@ -22,6 +22,13 @@ public sealed class AccountTypeService(
     ILogger<AccountTypeService> logger
 ) : IAccountTypeService
 {
+    private const string AccountTypeNotFound = "Account Type with id: {0} was not found";
+    private const string AccountTypeCodeAlreadyExists = "Account type with code: {0} is already exists.";
+    private const string AccountTypeCodeNotFound = "Account type with code: {0} was not found.";
+    private const string CodeIsRequired = "Account Type code is required.";
+    private const string DescriptionIsRequired = "Account Type Description is required.";
+    private const string DuplicateLanguagesFound = "Duplicate language codes for account {0} found: {1}";
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -30,9 +37,10 @@ public sealed class AccountTypeService(
     /// <returns><inheritdoc/></returns>
     public async Task<Result<AccountTypeDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var accountType = await repository.GetByIdAsync(id, languageContext.CurrentLanguageCode, cancellationToken);
-        if (accountType is null)
-            return AppError.NotFound($"Account Type with id: {id} was not found");
+        var accountTypeResult = await GetAccountTypeResultAsync(id, cancellationToken);
+        if (accountTypeResult.IsFailed)
+            return Result.Fail(accountTypeResult.Errors);
+        var accountType = accountTypeResult.Value;
 
         var accountTypeDto = accountType.ToDto(languageContext.CurrentLanguageCode);
         return Result.Ok(accountTypeDto);
@@ -49,12 +57,12 @@ public sealed class AccountTypeService(
     {
         if (string.IsNullOrWhiteSpace(code))
         {
-            return AppError.Validation("Account type code cannot be empty");
+            return AppError.Validation(CodeIsRequired);
         }
 
         var accountType = await repository.GetByCodeAsync(code, languageContext.CurrentLanguageCode, cancellationToken);
         if (accountType is null)
-            return AppError.NotFound($"Account type with code: {code} was not found");
+            return AppError.NotFound(string.Format(AccountTypeCodeNotFound, code));
 
         var accountTypeDto = accountType.ToDto(languageContext.CurrentLanguageCode);
 
@@ -107,14 +115,18 @@ public sealed class AccountTypeService(
         CancellationToken cancellationToken = default
     )
     {
-        if (!TryValidateRequiredFields(dto.Code, dto.Description, out var error))
-            return error;
+        var code = dto.Code.Trim();
+        var description = dto.Description.Trim();
 
-        if (await repository.ExistsByCodeAsync(dto.Code, cancellationToken))
-            return AppError.Conflict($"Account type with code: {dto.Code} is already exists.");
+        var validationResult = ValidateRequiredFields(code, description);
+        if (validationResult.IsFailed)
+            return validationResult;
+
+        if (await repository.ExistsByCodeAsync(code, cancellationToken))
+            return AppError.Conflict(string.Format(AccountTypeCodeAlreadyExists, dto.Code));
 
         if (dto.Translations?.CheckDuplicates(out var duplicatedLanguages) ?? false)
-            return AppError.Conflict($"Duplicate language codes found: {duplicatedLanguages}");
+            return AppError.Conflict(string.Format(DuplicateLanguagesFound, dto.Code, duplicatedLanguages));
 
         var accountType = dto.ToModel();
 
@@ -125,12 +137,14 @@ public sealed class AccountTypeService(
         {
             var created = await repository.AddAsync(accountType, cancellationToken);
             await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Account type {AccountTypeCode} created successfully", created.Code);
             return Result.Ok(created.ToDto(languageContext.CurrentLanguageCode));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occured while adding a new account type");
-            return AppError.Unexpected("Failed to create account type.");
+            logger.LogError(ex, "An error occured while adding a new account type with code {AccountTypeCode}", code);
+            // TODO: Add #Localization for error messages
+            return AppError.Unexpected("Failed to create a new account type.");
         }
     }
 
@@ -138,21 +152,23 @@ public sealed class AccountTypeService(
         CancellationToken cancellationToken = default
     )
     {
-        if (TryValidateRequiredFields(dto.Code, dto.Description, out var error))
-            return error;
+        var validationResult = ValidateRequiredFields(dto.Code, dto.Description);
+        if (validationResult.IsFailed)
+            return validationResult;
 
-        var accountType = await repository.GetByIdAsync(dto.Id, languageContext.CurrentLanguageCode, cancellationToken);
-        if (accountType is null)
-            return AppError.NotFound($"Account Type with id: {dto.Id} was not found");
+        var accountTypeResult = await GetAccountTypeResultAsync(dto.Id, cancellationToken);
+        if (accountTypeResult.IsFailed)
+            return Result.Fail(accountTypeResult.Errors);
+        var accountType = accountTypeResult.Value;
 
         if (accountType.Code != dto.Code &&
             await repository.ExistsByCodeAsync(dto.Code, cancellationToken))
         {
-            return AppError.Conflict($"Account Type code: {dto.Code} is already exists.");
+            return AppError.Conflict(string.Format(AccountTypeCodeAlreadyExists, dto.Code));
         }
 
         if (dto.Translations?.CheckDuplicates(out var duplicatedLanguages) ?? false)
-            return AppError.Conflict($"Duplicate language codes found: {duplicatedLanguages}");
+            return AppError.Conflict(string.Format(DuplicateLanguagesFound, dto.Code, duplicatedLanguages));
 
         accountType.Code = dto.Code.Trim();
         accountType.Description = dto.Description.Trim();
@@ -167,11 +183,13 @@ public sealed class AccountTypeService(
         {
             await repository.UpdateAsync(accountType, cancellationToken);
             await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Account type {AccountTypeId} updated successfully", dto.Id);
             return Result.Ok(accountType.ToDto(languageContext.CurrentLanguageCode));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occured while updating an account type {AccountTypeId}", dto.Id);
+            // TODO: Add #Localization for error messages
             return AppError.Unexpected($"Failed to update the account type {dto.Id}");
         }
     }
@@ -187,22 +205,26 @@ public sealed class AccountTypeService(
         {
             await repository.DeleteAsync(accountType, cancellationToken);
             await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Account type {AccountTypeId} deleted successfully", id);
             return Result.Ok();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occured while deleting an account type {AccountTypeId}", id);
+            // TODO: Add #Localization for error messages
             return AppError.Unexpected($"Failed to delete the account type {id}");
         }
     }
 
     public async Task<Result> ArchiveAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var accountType = await repository.GetByIdAsync(id, languageContext.CurrentLanguageCode, cancellationToken);
-        if (accountType is null)
-            return AppError.NotFound($"Account Type with id: {id} was not found");
+        var accountTypeResult = await GetAccountTypeResultAsync(id, cancellationToken);
+        if (accountTypeResult.IsFailed)
+            return Result.Fail(accountTypeResult.Errors);
+        var accountType = accountTypeResult.Value;
+
         if (accountType.IsArchived)
-            return Result.Ok();
+            return Result.Ok().WithSuccess("The account type is already archived");
 
         accountType.IsArchived = true;
 
@@ -216,18 +238,20 @@ public sealed class AccountTypeService(
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occured while archiving an account type {AccountTypeId}", id);
+            // TODO: Add #Localization for error messages
             return AppError.Unexpected("An error occured while archiving an account type");
         }
     }
 
     public async Task<Result> UnarchiveAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var accountType = await repository.GetByIdAsync(id, languageContext.CurrentLanguageCode, cancellationToken);
-        if (accountType is null)
-            return AppError.NotFound($"Account Type with id: {id} was not found");
+        var accountTypeResult = await GetAccountTypeResultAsync(id, cancellationToken);
+        if (accountTypeResult.IsFailed)
+            return Result.Fail(accountTypeResult.Errors);
+        var accountType = accountTypeResult.Value;
 
         if (!accountType.IsArchived)
-            return Result.Ok();
+            return Result.Ok().WithSuccess("The account type is not archived");
 
         accountType.IsArchived = false;
 
@@ -241,21 +265,21 @@ public sealed class AccountTypeService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occured while unarchiving an account type {AccountTypeId}", id);
-            return AppError.Unexpected("An error occured while unarchiving an account type");
+            logger.LogError(ex, "An error occured while unarchiving the account type {AccountTypeId}", id);
+            // TODO: Add #Localization for error messages
+            return AppError.Unexpected("Failed to unarchive the account type");
         }
     }
 
-    private bool TryValidateRequiredFields(string code, string description, out AppError? error)
+    private Result ValidateRequiredFields(string code, string description)
     {
-        error = null;
         if (string.IsNullOrWhiteSpace(code))
-            error = AppError.Validation("AccountType code is required.");
+            return AppError.Validation(CodeIsRequired);
 
         if (string.IsNullOrWhiteSpace(description))
-            error = AppError.Validation("Description is required.");
+            return AppError.Validation(DescriptionIsRequired);
 
-        return error is null;
+        return Result.Ok();
     }
 
     private void AddTranslations(AccountType accountType, ICollection<AccountTypeTranslationDto>? translationDtos)
@@ -267,5 +291,15 @@ public sealed class AccountTypeService(
                 accountType.Translations.Add(translation.ToModel(accountType.Id));
             }
         }
+    }
+
+    private async Task<Result<AccountType>> GetAccountTypeResultAsync(Guid id,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var accountType = await repository.GetByIdAsync(id, languageContext.CurrentLanguageCode, cancellationToken);
+        return accountType is null
+            ? AppError.NotFound(string.Format(AccountTypeNotFound, id)) // TODO: Add #Localization for error messages
+            : Result.Ok(accountType);
     }
 }

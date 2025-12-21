@@ -14,12 +14,16 @@ public abstract class TransactionExecutor(IUnitOfWorkManager unitOfWorkManager, 
     /// <inheritdoc/>
     /// </summary>
     /// <param name="operation"><inheritdoc/></param>
-    /// <param name="errorDescription"><inheritdoc/>></param>
+    /// <param name="informationLogDescription"><inheritdoc/></param>
+    /// <param name="errorDescription"><inheritdoc/></param>
+    /// <param name="errorLogDescription"><inheritdoc/></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <typeparam name="T"><inheritdoc/></typeparam>
     /// <returns><inheritdoc/></returns>
     public async Task<Result<T>> ExecuteAsync<T>(Func<Task<T>> operation,
+        string? informationLogDescription,
         string errorDescription,
+        string errorLogDescription,
         CancellationToken cancellationToken = default
     )
     {
@@ -28,6 +32,8 @@ public abstract class TransactionExecutor(IUnitOfWorkManager unitOfWorkManager, 
         {
             var result = await operation();
             await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+            if (!string.IsNullOrWhiteSpace(informationLogDescription) && logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation(informationLogDescription);
             return Result.Ok(result);
         }
         catch (Exception ex)
@@ -41,10 +47,15 @@ public abstract class TransactionExecutor(IUnitOfWorkManager unitOfWorkManager, 
     /// <inheritdoc/>
     /// </summary>
     /// <param name="operation"><inheritdoc/></param>
+    /// <param name="informationLogDescription"><inheritdoc/></param>
     /// <param name="errorDescription"><inheritdoc/></param>
+    /// <param name="errorLogDescription"><inheritdoc/></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
-    public async Task<Result> ExecuteAsync(Func<Task> operation, string errorDescription,
+    public async Task<Result> ExecuteAsync(Func<Task> operation,
+        string? informationLogDescription,
+        string errorDescription,
+        string errorLogDescription,
         CancellationToken cancellationToken = default
     )
     {
@@ -53,6 +64,8 @@ public abstract class TransactionExecutor(IUnitOfWorkManager unitOfWorkManager, 
         {
             await operation();
             await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+            if (!string.IsNullOrWhiteSpace(informationLogDescription) && logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation(informationLogDescription);
             return Result.Ok();
         }
         catch (Exception ex)
