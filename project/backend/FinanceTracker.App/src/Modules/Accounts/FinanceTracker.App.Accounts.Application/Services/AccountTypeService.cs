@@ -15,7 +15,7 @@ namespace FinanceTracker.App.Accounts.Application.Services;
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public sealed class AccountTypeService(
+internal sealed class AccountTypeService(
     ILanguageContext languageContext,
     IAccountTypeRepository repository,
     IAccountsUnitOfWorkManager unitOfWorkManager,
@@ -40,9 +40,8 @@ public sealed class AccountTypeService(
         var accountTypeResult = await GetAccountTypeResultAsync(id, cancellationToken);
         if (accountTypeResult.IsFailed)
             return Result.Fail(accountTypeResult.Errors);
-        var accountType = accountTypeResult.Value;
 
-        var accountTypeDto = accountType.ToDto(languageContext.CurrentLanguageCode);
+        var accountTypeDto = accountTypeResult.Value.ToDto(languageContext.CurrentLanguageCode);
         return Result.Ok(accountTypeDto);
     }
 

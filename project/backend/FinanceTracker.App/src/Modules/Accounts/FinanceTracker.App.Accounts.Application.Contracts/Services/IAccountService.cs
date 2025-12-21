@@ -14,12 +14,12 @@ public interface IAccountService
     /// <summary>
     /// Возвращает счёт по идентификатору.
     /// </summary>
-    Task<Result<AccountDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Result<AccountDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Возвращает счёт по идентификатору с проверкой принадлежности пользователю.
     /// </summary>
-    Task<Result<AccountDto?>> GetByIdForUserAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
+    Task<Result<AccountDto>> GetByIdForUserAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Возвращает постраничный список счетов пользователя.
