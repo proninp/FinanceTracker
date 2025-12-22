@@ -36,6 +36,7 @@ public interface IAccountRepository
     /// <summary>
     /// Получить постраничный список счётов.
     /// </summary>
+    /// <param name="userId">Идентификатор пользователя-владельца.</param>
     /// <param name="settings">Настройки пагинации.</param>
     /// <param name="languageCode">
     /// Код языка для фильтрации переводов связанных сущностей
@@ -45,6 +46,7 @@ public interface IAccountRepository
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Результат пагинации со списком Account.</returns>
     Task<PaginationResult<Account>> GetPagedAsync(PaginationSettings settings,
+        Guid userId,
         string? languageCode = null,
         bool includeArchived = false,
         CancellationToken cancellationToken = default

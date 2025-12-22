@@ -19,7 +19,7 @@ internal sealed class AccountRepository(
     /// <inheritdoc/>
     /// </summary>
     /// <param name="id"><inheritdoc/></param>
-    /// <param name="languageCode"></param>
+    /// <param name="languageCode"><inheritdoc/></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
     public async Task<Account?> GetByIdAsync(
@@ -40,7 +40,7 @@ internal sealed class AccountRepository(
     /// </summary>
     /// <param name="id"><inheritdoc/></param>
     /// <param name="userId"><inheritdoc/></param>
-    /// <param name="languageCode"></param>
+    /// <param name="languageCode"><inheritdoc/></param>
     /// <param name="cancellationToken"><inheritdoc/></param>
     /// <returns><inheritdoc/></returns>
     public async Task<Account?> GetByIdForUserAsync(
@@ -61,6 +61,7 @@ internal sealed class AccountRepository(
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="userId"><inheritdoc/></param>
     /// <param name="settings"><inheritdoc/></param>
     /// <param name="languageCode"></param>
     /// <param name="includeArchived"><inheritdoc/></param>
@@ -68,12 +69,15 @@ internal sealed class AccountRepository(
     /// <returns><inheritdoc/></returns>
     public async Task<PaginationResult<Account>> GetPagedAsync(
         PaginationSettings settings,
+        Guid userId,
         string? languageCode = null,
         bool includeArchived = false,
         CancellationToken cancellationToken = default
     )
     {
-        var query = context.Accounts.AsNoTracking();
+        var query = context.Accounts
+            .AsNoTracking()
+            .Where(a => a.UserId == userId);
 
         if (!includeArchived)
         {
