@@ -82,4 +82,12 @@ public static class AccountDtoExtensions
             IsArchived = account.IsArchived
         };
     }
+
+    /// <summary>
+    /// Преобразует перечисление доменных моделей счёта в список DTO с учётом языка.
+    /// </summary>
+    public static List<AccountDto> ToDto(this IEnumerable<Account> accounts, string languageCode) =>
+        accounts
+            .Select(a => a.ToDto(languageCode))
+            .ToList();
 }
