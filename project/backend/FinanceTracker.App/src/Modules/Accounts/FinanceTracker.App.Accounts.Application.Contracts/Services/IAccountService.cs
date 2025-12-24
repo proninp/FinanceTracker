@@ -41,7 +41,7 @@ public interface IAccountService
     /// <summary>
     /// Возвращает счёт пользователя, установленный по умолчанию.
     /// </summary>
-    Task<Result<AccountDto?>> GetDefaultAccountForUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<Result<AccountDto>> GetDefaultAccountForUserAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Создаёт новый счёт.

@@ -41,4 +41,14 @@ public static class AccountTranslationDtoExtensions
             Description = dto.Description.Trim()
         };
     }
+
+    public static AccountTranslation ToModel(this AccountTranslationDto dto, Guid accountId)
+    {
+        return new AccountTranslation
+        {
+            EntityId = accountId,
+            LanguageCode = dto.LanguageCode,
+            Name = dto.Name.Trim()
+        };
+    }
 }

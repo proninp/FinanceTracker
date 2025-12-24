@@ -92,15 +92,30 @@ internal class AccountService(
         return Result.Ok<IReadOnlyList<AccountDto>>(accountDtos);
     }
 
-    public Task<Result<AccountDto?>> GetDefaultAccountForUserAsync(Guid userId,
+    public async Task<Result<AccountDto>> GetDefaultAccountForUserAsync(Guid userId,
         CancellationToken cancellationToken = default
     )
     {
-        throw new NotImplementedException();
+        var account = await repository.GetDefaultAccountForUserAsync(userId, languageContext.CurrentLanguageCode, cancellationToken);
+        return account is null
+            ? AppError.NotFound($"The default account for user with id: {userId} was not found")
+            : Result.Ok(account.ToDto(languageContext.CurrentLanguageCode));
     }
 
-    public Task<Result<AccountDto>> CreateAsync(CreateAccountDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<AccountDto>> CreateAsync(CreateAccountDto dto, CancellationToken cancellationToken = default)
     {
+        var account = dto.ToModel();
+        if (string.IsNullOrEmpty(account.Name))
+            return AppError.Validation(AccountNameIsRequired);
+
+        if (dto.Translations?.CheckDuplicates(out var duplicateLanguages) ?? false)
+            return AppError.Validation(string.Format(DuplicateLanguagesFound, dto.Name, duplicateLanguages));
+
+        AddTranslations(account, dto.Translations);
+
+        // Если IsDefault = true, нужно снять флаг default с других счетов пользователя
+
+        // Добавить Account в БД
         throw new NotImplementedException();
     }
 
@@ -137,5 +152,16 @@ internal class AccountService(
         return account is null
             ? AppError.NotFound(string.Format(AccountNotFound, id)) // TODO: Add #Localization for error messages
             : Result.Ok(account);
+    }
+
+    private void AddTranslations(Account account, ICollection<AccountTranslationDto>? translationDtos)
+    {
+        if (translationDtos is not null && translationDtos.Count != 0)
+        {
+            foreach (var translation in translationDtos)
+            {
+                account.Translations.Add(translation.ToModel(account.Id));
+            }
+        }
     }
 }
