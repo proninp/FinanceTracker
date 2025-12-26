@@ -96,13 +96,18 @@ internal class AccountService(
         CancellationToken cancellationToken = default
     )
     {
-        var account = await repository.GetDefaultAccountForUserAsync(userId, languageContext.CurrentLanguageCode, cancellationToken);
+        var account =
+            await repository.GetDefaultAccountForUserAsync(userId, languageContext.CurrentLanguageCode,
+                cancellationToken
+            );
         return account is null
             ? AppError.NotFound($"The default account for user with id: {userId} was not found")
             : Result.Ok(account.ToDto(languageContext.CurrentLanguageCode));
     }
 
-    public async Task<Result<AccountDto>> CreateAsync(CreateAccountDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<AccountDto>> CreateAsync(CreateAccountDto dto,
+        CancellationToken cancellationToken = default
+    )
     {
         var account = dto.ToModel();
         if (string.IsNullOrEmpty(account.Name))
@@ -113,10 +118,37 @@ internal class AccountService(
 
         AddTranslations(account, dto.Translations);
 
-        // Если IsDefault = true, нужно снять флаг default с других счетов пользователя
+        Account? previousDefaultAccount = null;
+        if (dto.IsDefault)
+        {
+            previousDefaultAccount = await repository.GetDefaultAccountForUserAsync(dto.UserId,
+                languageContext.CurrentLanguageCode, cancellationToken);
+        }
 
-        // Добавить Account в БД
-        throw new NotImplementedException();
+        unitOfWorkManager.StartUnitOfWork();
+
+        try
+        {
+            if (previousDefaultAccount != null)
+            {
+                previousDefaultAccount.IsDefault = false;
+                await repository.UpdateAsync(previousDefaultAccount, cancellationToken);
+            }
+
+            await repository.AddAsync(account, cancellationToken);
+            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Account {AccountName} has been added for user {UserId} successfully", dto.Name,
+                account.UserId
+            );
+            return Result.Ok(account.ToDto(languageContext.CurrentLanguageCode));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occured while adding an account {AccountName} for user {UserId}", dto.Name,
+                account.UserId
+            );
+            return AppError.Unexpected("An error occured while adding an account");
+        }
     }
 
     public Task<Result<AccountDto>> UpdateAsync(UpdateAccountDto dto, CancellationToken cancellationToken = default)
