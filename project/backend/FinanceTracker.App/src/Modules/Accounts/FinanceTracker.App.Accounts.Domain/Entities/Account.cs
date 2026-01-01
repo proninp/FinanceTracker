@@ -21,7 +21,7 @@ public class Account : Entity, IArchivableEntity, ITranslatableEntity<AccountTra
     /// <summary>
     /// Тип счёта.
     /// </summary>
-    public required AccountType AccountType { get; set; }
+    public AccountType AccountType { get; set; } = null!;
 
     /// <summary>
     /// Идентификатор валюты счёта.

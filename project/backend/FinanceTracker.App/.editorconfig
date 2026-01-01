@@ -4,7 +4,7 @@ root = true
 
 ### All Files
 [*]
-charset = utf-8
+charset = utf-8-bom
 indent_style = space
 indent_size = 4
 insert_final_newline = true
@@ -57,6 +57,8 @@ indent_style = tab
 ## Code Quality Rules -- https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/quality-rules/
 
 [*.cs]
+
+max_line_length = 120
 
 # свойства не должны быть доступны только на запись
 dotnet_diagnostic.CA1044.severity = error
@@ -159,8 +161,6 @@ dotnet_diagnostic.IDE0240.severity = error
 dotnet_diagnostic.IDE0303.severity = error
 ### IDE2000: пустые строки
 dotnet_diagnostic.IDE2000.severity = error
-
-
 ## Fixing formating  https://learn.microsoft.com/ru-ru/dotnet/fundamentals/code-analysis/style-rules/csharp-formatting-options
 dotnet_diagnostic.IDE0055.severity = warning
 

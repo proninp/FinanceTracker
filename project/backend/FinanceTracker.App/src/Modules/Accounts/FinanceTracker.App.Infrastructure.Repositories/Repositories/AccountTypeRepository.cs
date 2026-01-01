@@ -1,8 +1,8 @@
 using FinanceTracker.App.Accounts.Application.Contracts.Repositories;
+using FinanceTracker.App.Accounts.Application.Contracts.UnitOfWork;
 using FinanceTracker.App.Accounts.Domain.Entities;
 using FinanceTracker.App.Infrastructure.EntityFramework;
 using FinanceTracker.App.ShareKernel.Application.Pagination;
-using FinanceTracker.App.ShareKernel.Application.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceTracker.App.Infrastructure.Repositories.Repositories;
@@ -12,7 +12,7 @@ namespace FinanceTracker.App.Infrastructure.Repositories.Repositories;
 /// </summary>
 internal sealed class AccountTypeRepository(
     AccountsDbContext context,
-    IUnitOfWorkManager<AccountsDbContext> unitOfWorkManager
+    IAccountsUnitOfWorkManager unitOfWorkManager
 ) : IAccountTypeRepository
 {
     /// <summary>

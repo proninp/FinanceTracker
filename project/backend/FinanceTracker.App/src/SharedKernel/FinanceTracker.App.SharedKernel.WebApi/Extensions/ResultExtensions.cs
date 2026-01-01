@@ -32,7 +32,9 @@ public static class ResultExtensions
     /// <summary>
     /// Преобразует Result в CreatedAtAction для POST запросов
     /// </summary>
-    public static IActionResult ToCreatedActionResult<T>(this Result<T> result, string actionName, object? routeValues = null)
+    public static IActionResult ToCreatedActionResult<T>(this Result<T> result, string actionName,
+        object? routeValues = null
+    )
     {
         return result.IsSuccess
             ? new CreatedAtActionResult(actionName, null, routeValues, result.Value)
@@ -78,6 +80,7 @@ public static class ResultExtensions
             {
                 validationProblemDetails = new ValidationProblemDetails();
             }
+
             validationProblemDetails.Title = "Validation Error";
             validationProblemDetails.Detail = appError.Message;
             validationProblemDetails.Status = StatusCodes.Status400BadRequest;
@@ -85,6 +88,7 @@ public static class ResultExtensions
 
             return new BadRequestObjectResult(validationProblemDetails);
         }
+
         return MapErrorToActionResult(appError ?? new AppError(result.Errors[0].Message, AppErrorCode.UnexpectedError));
     }
 
@@ -97,6 +101,7 @@ public static class ResultExtensions
         {
             return GetUnexpectedResult(error.Message);
         }
+
         var (statusCode, title) = appError.ErrorCode switch
         {
             AppErrorCode.NotFound => (StatusCodes.Status404NotFound, "Resource Not Found"),
@@ -128,12 +133,11 @@ public static class ResultExtensions
     private static IActionResult GetUnexpectedResult(string message)
     {
         return new ObjectResult(new ProblemDetails
-            {
-                Title = "Unexpected Error",
-                Detail = message,
-                Status = StatusCodes.Status500InternalServerError,
-            }
-        )
+        {
+            Title = "Unexpected Error",
+            Detail = message,
+            Status = StatusCodes.Status500InternalServerError,
+        })
         {
             StatusCode = StatusCodes.Status500InternalServerError
         };
