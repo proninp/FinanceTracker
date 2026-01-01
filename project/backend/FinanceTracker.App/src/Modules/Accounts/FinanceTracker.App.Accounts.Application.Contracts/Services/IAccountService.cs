@@ -56,20 +56,15 @@ public interface IAccountService
     /// <summary>
     /// Удаляет счёт пользователя.
     /// </summary>
-    Task<Result> DeleteAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
+    Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Архивирует счёт пользователя.
     /// </summary>
-    Task<Result> ArchiveAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
+    Task<Result> ArchiveAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Снимает счёт пользователя с архива.
     /// </summary>
-    Task<Result> UnarchiveAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Назначает счёт пользователю как счёт по умолчанию.
-    /// </summary>
-    Task<Result> SetAsDefaultAsync(Guid id, Guid userId, CancellationToken cancellationToken = default);
+    Task<Result> UnarchiveAsync(Guid id, CancellationToken cancellationToken = default);
 }
