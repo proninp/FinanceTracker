@@ -22,34 +22,20 @@ internal class AccountService(
     private const string AccountNotFoundForUser = "Account with id: {0} was not found for user {1}";
     private const string AccountNameIsRequired = "Account name is required.";
     private const string DuplicateLanguagesFound = "Duplicate language codes for account {0} found: {1}";
+    private const string DefaultAccountNotFound = "The default account for user with id: {0} was not found";
 
     // Create account messages
     private const string AccountAddedSuccessLog = "Account {AccountName} has been added for user {UserId} successfully";
 
-    private const string ErrorAddingAccountLog =
-        "An error occured while adding an account {AccountName} for user {UserId}";
-
-    private const string ErrorAddingAccount = "An error occured while adding an account";
-
     // Update account messages
     private const string AccountUpdatedSuccessLog =
         "Account {AccountName} with {AccountId} id has been updated successfully";
-
-    private const string ErrorUpdatingAccountLog =
-        "An error occured while updating an account {AccountId} for user {UserId}";
-
-    private const string ErrorUpdatingAccount = "An error occured while updating an account";
 
     // Delete account messages
     private const string AccountAlreadyDeletedLog = "Account with {AccountId} id has already been deleted";
 
     private const string AccountDeletedSuccessLog =
         "Account {AccountName} with {AccountId} id has been deleted successfully";
-
-    private const string ErrorDeletingAccountLog =
-        "An error occured while deleting an account {AccountId}";
-
-    private const string ErrorDeletingAccount = "An error occured while deleting an account";
 
     private const string ErrorDeletingDefaultAccountLog =
         "Сannot delete the default account {AccountId}";
@@ -65,20 +51,8 @@ internal class AccountService(
     private const string AccountArchivedSuccessLog =
         "Account {AccountName} with {AccountId} id has been archived successfully";
 
-    private const string ErrorArchivingAccountLog =
-        "An error occured while archiving an account {AccountId}";
-
-    private const string ErrorArchivingAccount =
-        "An error occured while archiving an account";
-
     private const string AccountUnarchivedSuccessLog =
         "Account {AccountName} with {AccountId} id has been unarchived successfully";
-
-    private const string ErrorUnarchivingAccountLog =
-        "An error occured while unarchiving an account {AccountId}";
-
-    private const string ErrorUnarchivingAccount =
-        "An error occured while unarchiving an account";
 
     /// <summary>
     /// <inheritdoc/>
@@ -157,7 +131,7 @@ internal class AccountService(
                 cancellationToken
             );
         return account is null
-            ? AppError.NotFound($"The default account for user with id: {userId} was not found")
+            ? AppError.NotFound(string.Format(DefaultAccountNotFound, userId))
             : Result.Ok(account.ToDto(languageContext.CurrentLanguageCode));
     }
 
@@ -174,25 +148,16 @@ internal class AccountService(
 
         AddTranslations(account, dto.Translations);
 
-        try
-        {
-            unitOfWorkManager.StartUnitOfWork();
+        if (account.IsDefault)
+            await ClearPreviousDefaultAccount(account.UserId, cancellationToken);
 
-            if (account.IsDefault)
-                await ClearPreviousDefaultAccount(account.UserId, cancellationToken);
+        unitOfWorkManager.StartUnitOfWork();
+        await repository.AddAsync(account, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
 
-            await repository.AddAsync(account, cancellationToken);
+        logger.LogInformation(AccountAddedSuccessLog, dto.Name, account.UserId);
 
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-
-            logger.LogInformation(AccountAddedSuccessLog, dto.Name, account.UserId);
-            return Result.Ok(account.ToDto(languageContext.CurrentLanguageCode));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, ErrorAddingAccountLog, dto.Name, account.UserId);
-            return AppError.Unexpected(ErrorAddingAccount);
-        }
+        return Result.Ok(account.ToDto(languageContext.CurrentLanguageCode));
     }
 
     public async Task<Result<AccountDto>> UpdateAsync(UpdateAccountDto dto,
@@ -210,33 +175,24 @@ internal class AccountService(
         if (dto.Translations?.CheckDuplicates(out var duplicateLanguages) ?? false)
             return AppError.Validation(string.Format(DuplicateLanguagesFound, dto.Name, duplicateLanguages));
 
-        try
-        {
-            unitOfWorkManager.StartUnitOfWork();
+        account.BankId = dto.BankId;
+        account.Name = name;
+        account.CreditLimit = dto.CreditLimit;
+        account.IsIncludeInBalance = dto.IsIncludeInBalance;
+        account.IsDefault = dto.IsDefault;
+        if (account.IsDefault)
+            await ClearPreviousDefaultAccount(account.UserId, cancellationToken);
 
-            account.BankId = dto.BankId;
-            account.Name = name;
-            account.CreditLimit = dto.CreditLimit;
-            account.IsIncludeInBalance = dto.IsIncludeInBalance;
-            account.IsDefault = dto.IsDefault;
-            if (account.IsDefault)
-                await ClearPreviousDefaultAccount(account.UserId, cancellationToken);
+        account.Translations.Clear();
+        AddTranslations(account, dto.Translations);
 
-            account.Translations.Clear();
-            AddTranslations(account, dto.Translations);
+        unitOfWorkManager.StartUnitOfWork();
+        await repository.UpdateAsync(account, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
 
-            await repository.UpdateAsync(account, cancellationToken);
+        logger.LogInformation(AccountUpdatedSuccessLog, dto.Name, account.Id);
 
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-
-            logger.LogInformation(AccountUpdatedSuccessLog, dto.Name, account.Id);
-            return Result.Ok(account.ToDto(languageContext.CurrentLanguageCode));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, ErrorUpdatingAccountLog, dto.Id, account.UserId);
-            return AppError.Unexpected(ErrorUpdatingAccount);
-        }
+        return Result.Ok(account.ToDto(languageContext.CurrentLanguageCode));
     }
 
     public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -255,18 +211,12 @@ internal class AccountService(
         }
 
         unitOfWorkManager.StartUnitOfWork();
-        try
-        {
-            await repository.DeleteAsync(account, cancellationToken);
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-            logger.LogInformation(AccountDeletedSuccessLog, account.Name, id);
-            return Result.Ok();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, ErrorDeletingAccountLog, id);
-            return AppError.Unexpected(ErrorDeletingAccount);
-        }
+        await repository.DeleteAsync(account, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(AccountDeletedSuccessLog, account.Name, id);
+
+        return Result.Ok();
     }
 
     public async Task<Result> ArchiveAsync(Guid id, CancellationToken cancellationToken = default)
@@ -281,18 +231,12 @@ internal class AccountService(
         account.IsArchived = true;
 
         unitOfWorkManager.StartUnitOfWork();
-        try
-        {
-            await repository.UpdateAsync(account, cancellationToken);
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-            logger.LogInformation(AccountArchivedSuccessLog, account.Name, id);
-            return Result.Ok();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, ErrorArchivingAccountLog, id);
-            return AppError.Unexpected(ErrorArchivingAccount);
-        }
+        await repository.UpdateAsync(account, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(AccountArchivedSuccessLog, account.Name, id);
+
+        return Result.Ok();
     }
 
     public async Task<Result> UnarchiveAsync(Guid id, CancellationToken cancellationToken = default)
@@ -307,18 +251,12 @@ internal class AccountService(
         account.IsArchived = false;
 
         unitOfWorkManager.StartUnitOfWork();
-        try
-        {
-            await repository.UpdateAsync(account, cancellationToken);
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-            logger.LogInformation(AccountUnarchivedSuccessLog, account.Name, id);
-            return Result.Ok();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, ErrorUnarchivingAccountLog, id);
-            return AppError.Unexpected(ErrorUnarchivingAccount);
-        }
+        await repository.UpdateAsync(account, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(AccountUnarchivedSuccessLog, account.Name, id);
+
+        return Result.Ok();
     }
 
     private async Task<Result<Account>> GetAccountResultAsync(Guid id,
