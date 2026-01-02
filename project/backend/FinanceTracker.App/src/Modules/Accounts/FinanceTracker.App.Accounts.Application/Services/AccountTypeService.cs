@@ -23,11 +23,18 @@ internal sealed class AccountTypeService(
 ) : IAccountTypeService
 {
     private const string AccountTypeNotFound = "Account Type with id: {0} was not found";
-    private const string AccountTypeCodeAlreadyExists = "Account type with code: {0} is already exists.";
-    private const string AccountTypeCodeNotFound = "Account type with code: {0} was not found.";
+    private const string AccountTypeCodeAlreadyExists = "Account Type with code: {0} is already exists.";
+    private const string AccountTypeCodeNotFound = "Account Type with code: {0} was not found.";
     private const string CodeIsRequired = "Account Type code is required.";
     private const string DescriptionIsRequired = "Account Type Description is required.";
     private const string DuplicateLanguagesFound = "Duplicate language codes for account {0} found: {1}";
+    private const string AccountTypeCreatedSuccessfullyLog = "Account Type {AccountTypeCode} created successfully";
+    private const string AccountTypeUpdatedSuccessfullyLog = "Account Type {AccountTypeId} updated successfully";
+    private const string AccountTypeDeletedSuccessfullyLog = "Account Type {AccountTypeId} deleted successfully";
+    private const string AccountTypeArchivedSuccessfullyLog = "Account Type {AccountTypeId} archived successfully";
+    private const string AccountTypeAlreadyArchived = "The Account Type is already archived";
+    private const string AccountTypeUnarchivedSuccessfullyLog = "Account Type {AccountTypeId} unarchived successfully";
+    private const string AccountTypeAIsNotArchived = "The Account Type is not archived";
 
     /// <summary>
     /// <inheritdoc/>
@@ -132,19 +139,12 @@ internal sealed class AccountTypeService(
         AddTranslations(accountType, dto.Translations);
 
         unitOfWorkManager.StartUnitOfWork();
-        try
-        {
-            var created = await repository.AddAsync(accountType, cancellationToken);
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-            logger.LogInformation("Account type {AccountTypeCode} created successfully", created.Code);
-            return Result.Ok(created.ToDto(languageContext.CurrentLanguageCode));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occured while adding a new account type with code {AccountTypeCode}", code);
-            // TODO: Add #Localization for error messages
-            return AppError.Unexpected("Failed to create a new account type.");
-        }
+        var created = await repository.AddAsync(accountType, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(AccountTypeCreatedSuccessfullyLog, created.Code);
+
+        return Result.Ok(created.ToDto(languageContext.CurrentLanguageCode));
     }
 
     public async Task<Result<AccountTypeDto>> UpdateAsync(UpdateAccountTypeDto dto,
@@ -178,19 +178,12 @@ internal sealed class AccountTypeService(
         AddTranslations(accountType, dto.Translations);
 
         unitOfWorkManager.StartUnitOfWork();
-        try
-        {
-            await repository.UpdateAsync(accountType, cancellationToken);
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-            logger.LogInformation("Account type {AccountTypeId} updated successfully", dto.Id);
-            return Result.Ok(accountType.ToDto(languageContext.CurrentLanguageCode));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occured while updating an account type {AccountTypeId}", dto.Id);
-            // TODO: Add #Localization for error messages
-            return AppError.Unexpected($"Failed to update the account type {dto.Id}");
-        }
+        await repository.UpdateAsync(accountType, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(AccountTypeUpdatedSuccessfullyLog, dto.Id);
+
+        return Result.Ok(accountType.ToDto(languageContext.CurrentLanguageCode));
     }
 
     public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -200,19 +193,13 @@ internal sealed class AccountTypeService(
             return Result.Ok();
 
         unitOfWorkManager.StartUnitOfWork();
-        try
-        {
-            await repository.DeleteAsync(accountType, cancellationToken);
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-            logger.LogInformation("Account type {AccountTypeId} deleted successfully", id);
-            return Result.Ok();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occured while deleting an account type {AccountTypeId}", id);
-            // TODO: Add #Localization for error messages
-            return AppError.Unexpected($"Failed to delete the account type {id}");
-        }
+
+        await repository.DeleteAsync(accountType, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(AccountTypeDeletedSuccessfullyLog, id);
+
+        return Result.Ok();
     }
 
     public async Task<Result> ArchiveAsync(Guid id, CancellationToken cancellationToken = default)
@@ -223,23 +210,17 @@ internal sealed class AccountTypeService(
         var accountType = accountTypeResult.Value;
 
         if (accountType.IsArchived)
-            return Result.Ok().WithSuccess("The account type is already archived");
+            return Result.Ok().WithSuccess(AccountTypeAlreadyArchived);
 
         accountType.IsArchived = true;
 
         unitOfWorkManager.StartUnitOfWork();
-        try
-        {
-            await repository.UpdateAsync(accountType, cancellationToken);
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
-            return Result.Ok();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occured while archiving an account type {AccountTypeId}", id);
-            // TODO: Add #Localization for error messages
-            return AppError.Unexpected("An error occured while archiving an account type");
-        }
+        await repository.UpdateAsync(accountType, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(AccountTypeArchivedSuccessfullyLog, id);
+
+        return Result.Ok();
     }
 
     public async Task<Result> UnarchiveAsync(Guid id, CancellationToken cancellationToken = default)
@@ -250,24 +231,17 @@ internal sealed class AccountTypeService(
         var accountType = accountTypeResult.Value;
 
         if (!accountType.IsArchived)
-            return Result.Ok().WithSuccess("The account type is not archived");
+            return Result.Ok().WithSuccess(AccountTypeAIsNotArchived);
 
         accountType.IsArchived = false;
 
         unitOfWorkManager.StartUnitOfWork();
-        try
-        {
-            await repository.UpdateAsync(accountType, cancellationToken);
-            await unitOfWorkManager.SaveChangesAsync(cancellationToken);
+        await repository.UpdateAsync(accountType, cancellationToken);
+        await unitOfWorkManager.SaveChangesAsync(cancellationToken);
 
-            return Result.Ok();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occured while unarchiving the account type {AccountTypeId}", id);
-            // TODO: Add #Localization for error messages
-            return AppError.Unexpected("Failed to unarchive the account type");
-        }
+        logger.LogInformation(AccountTypeUnarchivedSuccessfullyLog, id);
+
+        return Result.Ok();
     }
 
     private Result ValidateRequiredFields(string code, string description)
